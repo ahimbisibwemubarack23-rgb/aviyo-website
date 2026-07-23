@@ -1,0 +1,29 @@
+<!-- public/images/hero-bg.svg -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" width="1200" height="800">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#E8F5E9;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#FDF6E3;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FAF0E6;stop-opacity:1" />
+    </linearGradient>
+    <pattern id="leaves" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse">
+      <circle cx="50" cy="50" r="30" fill="#2D6A4F" opacity="0.05"/>
+      <circle cx="0" cy="0" r="20" fill="#D4A373" opacity="0.03"/>
+    </pattern>
+  </defs>
+  
+  <rect width="1200" height="800" fill="url(#bgGrad)"/>
+  <rect width="1200" height="800" fill="url(#leaves)"/>
+  
+  <!-- Decorative circles -->
+  <circle cx="100" cy="100" r="150" fill="#2D6A4F" opacity="0.05"/>
+  <circle cx="1100" cy="700" r="200" fill="#D4A373" opacity="0.05"/>
+  <circle cx="600" cy="400" r="300" fill="#2D6A4F" opacity="0.03"/>
+  
+  <!-- Leaf decorations -->
+  <g opacity="0.1">
+    <path d="M100 200 C130 170 170 180 180 210 C190 240 160 260 130 250 C100 240 90 210 100 200Z" fill="#2D6A4F"/>
+    <path d="M1000 500 C1030 470 1070 480 1080 510 C1090 540 1060 560 1030 550 C1000 540 990 510 1000 500Z" fill="#D4A373"/>
+    <path d="M300 600 C330 570 370 580 380 610 C390 640 360 660 330 650 C300 640 290 610 300 600Z" fill="#2D6A4F"/>
+  </g>
+</svg>

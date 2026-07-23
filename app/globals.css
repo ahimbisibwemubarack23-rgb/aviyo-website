@@ -1,0 +1,38 @@
+/* app/globals.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply text-gray-900 antialiased;
+  }
+
+  * {
+    @apply border-gray-200;
+  }
+}
+
+@layer components {
+  .container {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+}
+
+/* Form styles */
+input, textarea, select {
+  @apply border-gray-300 focus:ring-2 focus:ring-primary-500 focus:border-transparent;
+}
+
+/* Button styles */
+.btn-primary {
+  @apply bg-primary-500 text-white px-6 py-3 rounded-lg font-medium hover:bg-primary-600 transition-colors disabled:opacity-50;
+}
+
+.btn-secondary {
+  @apply border-2 border-primary-500 text-primary-500 px-6 py-3 rounded-lg font-medium hover:bg-primary-50 transition-colors;
+}
