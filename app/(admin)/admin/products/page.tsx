@@ -2,10 +2,7 @@
 import { supabaseAdmin } from '@/lib/supabase/server'
 import Link from 'next/link'
 import Image from 'next/image'
-import { FaPlus, FaEdit, FaTrash, FaEye } from 'react-icons/fa'
-// app/(admin)/admin/products/page.tsx
 import { FaPlus, FaEdit, FaTrash, FaEye, FaBox } from 'react-icons/fa'
-
 
 async function getProducts() {
   const { data } = await supabaseAdmin
@@ -14,6 +11,8 @@ async function getProducts() {
     .order('created_at', { ascending: false })
   return data || []
 }
+
+// ... rest of the file remains the same
 
 export default async function ProductsManagementPage() {
   const products = await getProducts()
