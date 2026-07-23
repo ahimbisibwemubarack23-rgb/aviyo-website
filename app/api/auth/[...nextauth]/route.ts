@@ -3,6 +3,21 @@ import NextAuth from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import { supabaseAdmin } from '@/lib/supabase/server'
 
+// Extend the built-in types
+declare module 'next-auth' {
+  interface User {
+    role?: string
+  }
+  interface Session {
+    user: {
+      id?: string
+      email?: string
+      name?: string
+      role?: string
+    }
+  }
+}
+
 const handler = NextAuth({
   providers: [
     CredentialsProvider({
@@ -17,8 +32,6 @@ const handler = NextAuth({
         }
 
         try {
-          // In production, this would validate against Supabase Auth
-          // For now, we'll check against the users table
           const { data: user, error } = await supabaseAdmin
             .from('users')
             .select('*')
