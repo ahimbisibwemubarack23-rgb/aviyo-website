@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server'
 
 // GET - Fetch a single blog post
 export async function GET(
-  request: Request,
+  _request: Request,  // ← Add underscore to indicate intentionally unused
   { params }: { params: { id: string } }
 ) {
   try {
@@ -34,7 +34,7 @@ export async function GET(
 
 // PUT - Update a blog post
 export async function PUT(
-  request: Request,
+  request: Request,  // ← This IS used
   { params }: { params: { id: string } }
 ) {
   try {
@@ -64,7 +64,7 @@ export async function PUT(
 
 // DELETE - Delete a blog post
 export async function DELETE(
-  request: Request,
+  _request: Request,  // ← Add underscore to indicate intentionally unused
   { params }: { params: { id: string } }
 ) {
   try {
