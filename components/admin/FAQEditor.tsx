@@ -1,6 +1,7 @@
 // components/admin/FAQEditor.tsx
 'use client'
 
+import { useState } from 'react'  // ← Add this import
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { supabase } from '@/lib/supabase/client'
@@ -74,7 +75,11 @@ export default function FAQEditor({ initialData, isEditing = false }: FAQEditorP
           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           placeholder="Enter the question"
         />
-        {errors.question && <p className="text-red-500 text-sm mt-1">{errors.question.message}</p>}
+        {errors.question && (
+          <p className="text-red-500 text-sm mt-1">
+            {String(errors.question.message)}
+          </p>
+        )}
       </div>
 
       <div>
@@ -87,7 +92,11 @@ export default function FAQEditor({ initialData, isEditing = false }: FAQEditorP
           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           placeholder="Enter the answer"
         />
-        {errors.answer && <p className="text-red-500 text-sm mt-1">{errors.answer.message}</p>}
+        {errors.answer && (
+          <p className="text-red-500 text-sm mt-1">
+            {String(errors.answer.message)}
+          </p>
+        )}
       </div>
 
       <div>
