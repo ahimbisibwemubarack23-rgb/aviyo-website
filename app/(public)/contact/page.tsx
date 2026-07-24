@@ -1,5 +1,4 @@
 // app/(public)/contact/page.tsx
-export const runtime = "edge";
 'use client'
 
 import { useState } from 'react'
@@ -85,7 +84,7 @@ export default function ContactPage() {
               <div className="text-2xl mb-2">✉️</div>
               <h3 className="font-semibold text-gray-900">Email Us</h3>
               <p className="text-sm text-gray-500 mt-1 break-all">
-                admin@aviyo.online
+                ahimbisibwemubarack23@gmail.com
               </p>
             </div>
 
@@ -98,9 +97,6 @@ export default function ContactPage() {
                 </a>
                 <a href="https://www.tiktok.com/@aviyo_plant_based" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-primary-500 transition-colors">
                   TikTok
-                </a>
-                 <a href="https://www.x.com/@aviyonutri7wg" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-primary-500 transition-colors">
-                  Twitter/ X
                 </a>
                 <a href="https://www.facebook.com/aviyoplantbased" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-primary-500 transition-colors">
                   Facebook
