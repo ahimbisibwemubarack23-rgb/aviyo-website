@@ -1,5 +1,4 @@
 // app/(admin)/admin/products/new/page.tsx
-export const runtime = "edge";
 'use client'
 
 import { useState } from 'react'
@@ -284,7 +283,7 @@ export default function NewProductPage() {
                   type="text"
                   value={newFeature}
                   onChange={(e) => setNewFeature(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && addFeature()}
+                  onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addFeature())}
                   className="flex-1 px-3 py-1 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500"
                   placeholder="Add a feature"
                 />
