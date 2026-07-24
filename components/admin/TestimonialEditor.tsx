@@ -84,7 +84,7 @@ export default function TestimonialEditor({ initialData, isEditing = false }: Te
           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           placeholder="Enter customer name"
         />
-        {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>}
+        {String(errors.name && <p className="text-red-500 text-sm mt-1">{errors.name.message)}</p>}
       </div>
 
       <div>
@@ -108,7 +108,7 @@ export default function TestimonialEditor({ initialData, isEditing = false }: Te
           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           placeholder="What did they say about Aviyo?"
         />
-        {errors.quote && <p className="text-red-500 text-sm mt-1">{errors.quote.message}</p>}
+        {String(errors.quote && <p className="text-red-500 text-sm mt-1">{errors.quote.message)}</p>}
       </div>
 
       <div>

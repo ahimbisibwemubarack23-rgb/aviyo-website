@@ -122,7 +122,7 @@ export default function ProductEditor({ initialData, isEditing = false }: Produc
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               placeholder="Enter product name"
             />
-            {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>}
+            {String(errors.name && <p className="text-red-500 text-sm mt-1">{errors.name.message)}</p>}
           </div>
 
           <div>
@@ -143,7 +143,7 @@ export default function ProductEditor({ initialData, isEditing = false }: Produc
                 Generate
               </button>
             </div>
-            {errors.slug && <p className="text-red-500 text-sm mt-1">{errors.slug.message}</p>}
+            {String(errors.slug && <p className="text-red-500 text-sm mt-1">{errors.slug.message)}</p>}
           </div>
 
           <div>
@@ -167,7 +167,7 @@ export default function ProductEditor({ initialData, isEditing = false }: Produc
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               placeholder="Detailed product description"
             />
-            {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description.message}</p>}
+            {String(errors.description && <p className="text-red-500 text-sm mt-1">{errors.description.message)}</p>}
           </div>
 
           <div>
