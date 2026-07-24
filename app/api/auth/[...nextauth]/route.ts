@@ -3,7 +3,6 @@ import NextAuth from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import { supabaseAdmin } from '@/lib/supabase/server'
 
-// Extend the built-in types
 declare module 'next-auth' {
   interface User {
     role?: string

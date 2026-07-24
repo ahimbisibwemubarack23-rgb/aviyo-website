@@ -1,4 +1,4 @@
-// app/(admin)/admin/testimonials/[id]/page.tsx
+// app/admin/testimonials/[id]/page.tsx
 'use client'
 
 import { useState, useEffect } from 'react'

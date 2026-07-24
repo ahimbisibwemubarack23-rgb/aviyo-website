@@ -2,7 +2,6 @@
 import { supabaseAdmin } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 
-// GET - Fetch a single testimonial
 export async function GET(
   _request: Request,
   { params }: { params: { id: string } }
@@ -32,7 +31,6 @@ export async function GET(
   }
 }
 
-// PUT - Update a testimonial
 export async function PUT(
   request: Request,
   { params }: { params: { id: string } }
@@ -58,7 +56,6 @@ export async function PUT(
   }
 }
 
-// DELETE - Delete a testimonial
 export async function DELETE(
   _request: Request,
   { params }: { params: { id: string } }
