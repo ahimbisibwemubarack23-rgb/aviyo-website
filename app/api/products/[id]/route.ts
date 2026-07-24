@@ -1,3 +1,4 @@
+export const runtime = "edge";
 // app/api/products/[id]/route.ts
 export const runtime = "edge";
 import { supabaseAdmin } from '@/lib/supabase/server'

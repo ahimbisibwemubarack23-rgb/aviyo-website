@@ -1,3 +1,4 @@
+export const runtime = "edge";
 // app/api/auth/[...nextauth]/route.ts
 export const runtime = "edge";
 import NextAuth from 'next-auth'
