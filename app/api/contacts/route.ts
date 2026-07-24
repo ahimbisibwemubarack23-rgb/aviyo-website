@@ -33,14 +33,12 @@ export async function POST(request: Request) {
       )
     }
 
-    const { data, error } = await supabaseAdmin
+    const { error } = await supabaseAdmin  // ← Removed 'data' from here
       .from('contact_submissions')
       .insert({
         ...body,
         status: 'new',
       })
-      .select()
-      .single()
 
     if (error) throw error
 

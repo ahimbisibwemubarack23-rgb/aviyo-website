@@ -34,14 +34,11 @@ export async function POST(request: Request) {
       )
     }
 
-    const { data, error } = await supabaseAdmin
+    const { error } = await supabaseAdmin  // ← Removed 'data' from here
       .from('newsletter_subscribers')
       .insert({ email })
-      .select()
-      .single()
 
     if (error) {
-      // Handle duplicate email
       if (error.code === '23505') {
         return NextResponse.json(
           { error: 'Already subscribed' },

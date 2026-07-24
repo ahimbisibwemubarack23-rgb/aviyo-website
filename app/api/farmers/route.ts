@@ -33,14 +33,12 @@ export async function POST(request: Request) {
       )
     }
 
-    const { data, error } = await supabaseAdmin
+    const { error } = await supabaseAdmin  // ← Removed 'data' from here
       .from('farmer_registrations')
       .insert({
         ...body,
         status: 'pending',
       })
-      .select()
-      .single()
 
     if (error) throw error
 
