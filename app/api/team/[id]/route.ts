@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server'
 
 // GET - Fetch a single team member
 export async function GET(
-  request: Request,
+  _request: Request,
   { params }: { params: { id: string } }
 ) {
   try {
@@ -63,7 +63,7 @@ export async function PUT(
 
 // DELETE - Delete a team member
 export async function DELETE(
-  request: Request,
+  _request: Request,
   { params }: { params: { id: string } }
 ) {
   try {

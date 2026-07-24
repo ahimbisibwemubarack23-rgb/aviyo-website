@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server'
 
 // GET - Fetch a single contact submission
 export async function GET(
-  request: Request,
+  _request: Request,  // ← Add underscore
   { params }: { params: { id: string } }
 ) {
   try {
@@ -34,7 +34,7 @@ export async function GET(
 
 // PUT - Update a contact submission status
 export async function PUT(
-  request: Request,
+  request: Request,  // ← This IS used
   { params }: { params: { id: string } }
 ) {
   try {
@@ -62,7 +62,7 @@ export async function PUT(
 
 // DELETE - Delete a contact submission
 export async function DELETE(
-  request: Request,
+  _request: Request,  // ← Add underscore
   { params }: { params: { id: string } }
 ) {
   try {
