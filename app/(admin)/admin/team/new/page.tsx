@@ -8,7 +8,7 @@ import { FaSpinner, FaUpload, FaTimes } from 'react-icons/fa'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { ToastContainer } from 'react-toastify'
-import ImageUpload from '@/components/admin/ImageUpload'
+//import ImageUpload from '@/components/admin/ImageUpload'
 
 export default function EditTeamMemberPage() {
   const router = useRouter()
