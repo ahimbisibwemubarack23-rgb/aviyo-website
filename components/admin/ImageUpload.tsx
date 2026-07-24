@@ -1,10 +1,11 @@
 // components/admin/ImageUpload.tsx
 'use client'
 
-// import { useState } from 'react'
-import { supabase } from '@/lib/supabase/client'
-import { toast } from 'react-toastify'
+import { useState } from 'react'  // ← Uncomment this line
 import { FaUpload, FaSpinner, FaTimes } from 'react-icons/fa'
+
+// ❌ Remove this line - it's not being used
+// import { supabase } from '@/lib/supabase/client'
 
 interface ImageUploadProps {
   value: string | null
@@ -16,7 +17,7 @@ interface ImageUploadProps {
   maxSize?: number // in MB
 }
 
-// ✅ COMPRESSION FUNCTION - This belongs here, NOT in route.ts
+// Compression function
 function compressImage(file: File, maxWidth = 1200, maxHeight = 1200, quality = 0.8): Promise<File> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
@@ -29,7 +30,6 @@ function compressImage(file: File, maxWidth = 1200, maxHeight = 1200, quality = 
         let width = img.width
         let height = img.height
         
-        // Resize if too large
         if (width > maxWidth) {
           height = (maxWidth / width) * height
           width = maxWidth
@@ -100,7 +100,7 @@ export default function ImageUpload({
           continue
         }
 
-        // ✅ COMPRESS THE IMAGE BEFORE UPLOAD
+        // Compress the image before upload
         const compressedFile = await compressImage(file)
         
         // Upload to Supabase Storage via API
