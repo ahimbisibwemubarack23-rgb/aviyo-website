@@ -1,4 +1,5 @@
 // app/api/newsletter/route.ts
+export const runtime = "edge";
 import { supabaseAdmin } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 
