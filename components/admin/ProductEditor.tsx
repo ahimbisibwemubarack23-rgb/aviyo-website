@@ -1,7 +1,7 @@
 // components/admin/ProductEditor.tsx
 'use client'
 
-//import { useState } from 'react'
+import { useState } from 'react'  // ← Add this import
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { supabase } from '@/lib/supabase/client'
@@ -9,6 +9,7 @@ import { toast } from 'react-toastify'
 import { FaSpinner, FaPlus, FaTimes } from 'react-icons/fa'
 import ImageUpload from './ImageUpload'
 
+// ... rest of the file
 interface ProductEditorProps {
   initialData?: any
   isEditing?: boolean
