@@ -1,5 +1,4 @@
 // app/(public)/news/page.tsx
-export const runtime = "edge";
 import { Metadata } from 'next'
 // import Link from 'next/link'
 

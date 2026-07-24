@@ -1,5 +1,4 @@
 // app/(admin)/admin/dashboard/page.tsx
-export const runtime = "edge";
 import { supabaseAdmin } from '@/lib/supabase/server'
 import {
   FaFileAlt,

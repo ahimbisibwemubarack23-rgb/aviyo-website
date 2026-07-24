@@ -1,4 +1,3 @@
-export const runtime = "edge";
 // app/api/farmers/route.ts
 import { supabaseAdmin } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'

@@ -1,5 +1,4 @@
 // app/(admin)/admin/farmers/page.tsx
-export const runtime = "edge";
 import { supabaseAdmin } from '@/lib/supabase/server'
 import { Metadata } from 'next'
 

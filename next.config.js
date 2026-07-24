@@ -1,34 +1,19 @@
-// next.config.js
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // ... any other config you have (like images, etc.) ...
+
+  // This is the key setting for Cloudflare Pages
+  // It tells Next.js to use the Edge Runtime for all pages by default
+  experimental: {
+    runtime: 'edge', 
+  },
+
+  // You can also optionally keep your existing images config, etc.
   images: {
-    domains: [
-      'supabase.co',
-      'wfwbkwijujlvirxjytihw.supabase.co',
-    ],
+    domains: ['supabase.co', 'wfwbkwijujlvirxjytihw.supabase.co'],
     formats: ['image/avif', 'image/webp'],
   },
+};
 
-  // ⚠️ Important: Cloudflare requires this
-  output: 'standalone',
-
-  compiler: {
-    removeConsole: process.env.NODE_ENV === 'production',
-  },
-
-  poweredByHeader: false,
-  reactStrictMode: true,
-  swcMinify: true,
-
-  async redirects() {
-    return [
-      {
-        source: '/admin',
-        destination: '/admin/dashboard',
-        permanent: true,
-      },
-    ]
-  },
-}
-
-module.exports = nextConfig
+module.exports = nextConfig;
+    

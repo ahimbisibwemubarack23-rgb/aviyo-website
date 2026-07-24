@@ -1,6 +1,5 @@
 // app/(public)/farmers/page.tsx
 'use client'
-export const runtime = "edge";
 
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase/client'

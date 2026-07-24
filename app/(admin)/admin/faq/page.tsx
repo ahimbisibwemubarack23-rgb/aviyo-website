@@ -1,5 +1,4 @@
 // app/(admin)/admin/faq/page.tsx
-export const runtime = "edge";
 import { supabaseAdmin } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { FaPlus, FaEdit, FaTrash, FaArrowUp, FaArrowDown } from 'react-icons/fa'

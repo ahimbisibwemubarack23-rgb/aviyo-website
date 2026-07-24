@@ -1,6 +1,5 @@
 // app/(admin)/admin/faq/new/page.tsx
 'use client'
-export const runtime = "edge";
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
