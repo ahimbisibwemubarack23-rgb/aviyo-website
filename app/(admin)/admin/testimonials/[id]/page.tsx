@@ -1,5 +1,4 @@
-// app/admin/testimonials/[id]/page.tsx
-export const runtime = "edge";
+// app/(admin)/admin/testimonials/[id]/page.tsx
 'use client'
 
 import { useState, useEffect } from 'react'
