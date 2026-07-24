@@ -1,72 +1,34 @@
 // app/(admin)/admin/testimonials/new/page.tsx
-export const runtime = "edge";
 'use client'
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase/client'
-import { FaSpinner, FaUpload, FaTimes, FaStar } from 'react-icons/fa'
+import { FaSpinner, FaStar } from 'react-icons/fa'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { ToastContainer } from 'react-toastify'
+import ImageUpload from '@/components/admin/ImageUpload'
 
 export default function NewTestimonialPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
-  const [uploading, setUploading] = useState(false)
-  const [photo, setPhoto] = useState('')
+  const [photo, setPhoto] = useState<string | null>(null)
+  const [rating, setRating] = useState(5)
   const [hoverRating, setHoverRating] = useState(0)
   const [formData, setFormData] = useState({
     name: '',
     role: '',
     quote: '',
-    rating: 5,
     is_active: true,
   })
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const value = e.target.type === 'checkbox' ? (e.target as HTMLInputElement).checked : e.target.value
     setFormData({
       ...formData,
       [e.target.name]: value,
     })
-  }
-
-  const handleRating = (rating: number) => {
-    setFormData({ ...formData, rating })
-  }
-
-  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-
-    setUploading(true)
-    try {
-      const fileExt = file.name.split('.').pop()
-      const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`
-      const filePath = `testimonials/${fileName}`
-
-      const { error: uploadError } = await supabase.storage
-        .from('images')
-        .upload(filePath, file)
-
-      if (uploadError) throw uploadError
-
-      const { data: { publicUrl } } = supabase.storage
-        .from('images')
-        .getPublicUrl(filePath)
-
-      setPhoto(publicUrl)
-      toast.success('Photo uploaded successfully')
-    } catch (error) {
-      toast.error('Failed to upload photo')
-    } finally {
-      setUploading(false)
-    }
-  }
-
-  const removePhoto = () => {
-    setPhoto('')
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -77,6 +39,7 @@ export default function NewTestimonialPage() {
       const payload = {
         ...formData,
         photo,
+        rating,
       }
 
       const { error } = await supabase.from('testimonials').insert(payload)
@@ -169,19 +132,17 @@ export default function NewTestimonialPage() {
                 type="button"
                 onMouseEnter={() => setHoverRating(i + 1)}
                 onMouseLeave={() => setHoverRating(0)}
-                onClick={() => handleRating(i + 1)}
+                onClick={() => setRating(i + 1)}
                 className="focus:outline-none"
               >
                 <FaStar
-                  className={`w-6 h-6 ${
-                    i < (hoverRating || formData.rating)
-                      ? 'text-yellow-400'
-                      : 'text-gray-200'
-                  } hover:text-yellow-400 transition-colors`}
+                  className={`w-8 h-8 transition-colors ${
+                    i < (hoverRating || rating) ? 'text-yellow-400' : 'text-gray-200'
+                  } hover:text-yellow-400`}
                 />
               </button>
             ))}
-            <span className="ml-2 text-sm text-gray-500">{formData.rating} / 5</span>
+            <span className="ml-2 text-sm text-gray-500">{rating} / 5</span>
           </div>
         </div>
 
@@ -189,39 +150,13 @@ export default function NewTestimonialPage() {
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Customer Photo
           </label>
-          <div className="flex items-center gap-4">
-            {photo ? (
-              <div className="relative w-16 h-16 rounded-full overflow-hidden bg-gray-100">
-                <img
-                  src={photo}
-                  alt="Customer"
-                  className="w-full h-full object-cover"
-                />
-                <button
-                  type="button"
-                  onClick={removePhoto}
-                  className="absolute top-0 right-0 bg-red-500 text-white p-0.5 rounded-full hover:bg-red-600"
-                >
-                  <FaTimes className="w-3 h-3" />
-                </button>
-              </div>
-            ) : (
-              <label className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:border-primary-500 transition-colors">
-                <FaUpload className="w-4 h-4 text-gray-400" />
-                <span className="text-sm text-gray-600">
-                  {uploading ? 'Uploading...' : 'Upload Photo'}
-                </span>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handlePhotoUpload}
-                  disabled={uploading}
-                  className="hidden"
-                />
-              </label>
-            )}
-            <p className="text-xs text-gray-500">Optional</p>
-          </div>
+          <ImageUpload
+            value={photo}
+            onChange={setPhoto}
+            folder="testimonials"
+            label="Upload customer photo"
+            circular
+          />
         </div>
 
         <div className="flex items-center gap-2">
