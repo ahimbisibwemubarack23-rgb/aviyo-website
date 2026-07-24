@@ -1,5 +1,4 @@
 // app/api/auth/[...nextauth]/route.ts
-export const runtime = "nodejs";
 import NextAuth from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import { supabaseAdmin } from '@/lib/supabase/server'
@@ -43,8 +42,6 @@ const handler = NextAuth({
             return null
           }
 
-          // In production, verify password hash here
-          // For now, we'll accept any password for development
           return {
             id: user.id,
             email: user.email,
