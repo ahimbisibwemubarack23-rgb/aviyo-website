@@ -1,6 +1,6 @@
-// app/(public)/farmers/page.tsx
-export const runtime = "edge";
 'use client'
+export const runtime = "edge";
+// app/(public)/farmers/page.tsx
 
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase/client'
@@ -91,7 +91,7 @@ export default function FarmersPage() {
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 text-center">
             <div className="text-3xl mb-3">🤝</div>
             <h3 className="font-semibold text-gray-900">Reliable Market</h3>
-            <p className="text-sm text-gray-500">Guaranteed market for your millet, sorghum, jackfruit, rice, maize, peas, sweet potatoes, okra, dates, cassava, and soybeans</p>
+            <p className="text-sm text-gray-500">Guaranteed market for your millet, sorghum, and soybeans</p>
           </div>
         </div>
 
@@ -188,7 +188,7 @@ export default function FarmersPage() {
                   onChange={handleChange}
                   required
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                  placeholder="e.g. millet, sorghum, jackfruit, rice, maize, peas, sweet potatoes, okra, dates, cassava, soybeans"
+                  placeholder="e.g. millet, sorghum, soybeans"
                 />
                 <p className="text-xs text-gray-500 mt-1">Comma separated</p>
               </div>
