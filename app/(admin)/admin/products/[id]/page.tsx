@@ -1,6 +1,3 @@
-// app/(admin)/admin/products/[id]/page.tsx
-export const runtime = "edge";
-'use client'
 
 import { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
@@ -436,3 +433,7 @@ export default function EditProductPage() {
     </div>
   )
 }
+
+// app/(admin)/admin/products/[id]/page.tsx
+export const runtime = "edge";
+'use client'

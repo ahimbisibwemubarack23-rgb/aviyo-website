@@ -1,6 +1,3 @@
-// app/(admin)/admin/blog/[id]/page.tsx
-export const runtime = "edge";
-'use client'
 
 import { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
@@ -258,3 +255,7 @@ export default function EditBlogPostPage() {
     </div>
   )
 }
+
+// app/(admin)/admin/blog/[id]/page.tsx
+export const runtime = "edge";
+'use client'

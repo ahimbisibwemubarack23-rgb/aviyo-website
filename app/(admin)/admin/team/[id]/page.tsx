@@ -1,6 +1,3 @@
-// app/(admin)/admin/team/[id]/page.tsx
-export const runtime = "edge";
-'use client'
 
 import { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
@@ -319,3 +316,7 @@ export default function EditTeamMemberPage() {
     </div>
   )
 }
+
+// app/(admin)/admin/team/[id]/page.tsx
+export const runtime = "edge";
+'use client'
