@@ -1,5 +1,4 @@
 // app/(admin)/admin/blog/new/page.tsx
-export const runtime = "edge";
 'use client'
 
 import { useState } from 'react'

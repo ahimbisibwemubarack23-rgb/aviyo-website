@@ -1,5 +1,4 @@
 // app/(public)/page.tsx
-export const runtime = "edge";
 import Link from 'next/link'
 import { supabaseAdmin } from '@/lib/supabase/server'
 

@@ -1,5 +1,5 @@
-// app/(public)/contact/page.tsx
 'use client'
+// app/(public)/contact/page.tsx
 
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase/client'
