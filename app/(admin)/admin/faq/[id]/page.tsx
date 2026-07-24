@@ -1,5 +1,5 @@
+// app/(admin)/admin/faq/[id]/page.tsx
 'use client'
-export const runtime = "edge";
 
 import { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
@@ -193,5 +193,3 @@ export default function EditFAQPage() {
     </div>
   )
 }
-
-// app/(admin)/admin/faq/[id]/page.tsx
