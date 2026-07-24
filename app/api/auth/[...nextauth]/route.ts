@@ -1,4 +1,5 @@
 // app/api/auth/[...nextauth]/route.ts
+export const runtime = "edge";
 import NextAuth from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import { supabaseAdmin } from '@/lib/supabase/server'

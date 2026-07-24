@@ -1,4 +1,5 @@
 // app/(public)/farmers/page.tsx
+export const runtime = "edge";
 'use client'
 
 import { useState } from 'react'

@@ -1,4 +1,5 @@
 // app/(public)/faq/page.tsx
+export const runtime = "edge";
 import { supabaseAdmin } from '@/lib/supabase/server'
 import { Metadata } from 'next'
 

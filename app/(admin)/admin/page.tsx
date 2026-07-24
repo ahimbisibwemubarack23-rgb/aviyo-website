@@ -1,4 +1,5 @@
 // app/(admin)/page.tsx
+export const runtime = "edge";
 import { redirect } from 'next/navigation'
 
 export default function AdminPage() {
