@@ -1,4 +1,5 @@
 // app/(admin)/admin/blog/page.tsx
+export const runtime = "edge";
 import { supabaseAdmin } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { FaPlus, FaEdit, FaTrash, FaEye } from 'react-icons/fa'
