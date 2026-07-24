@@ -1,7 +1,7 @@
 // components/admin/DeleteModal.tsx
 'use client'
 
-// import { useState } from 'react'
+import { useState } from 'react'  // ← Add this import
 import { FaTimes, FaSpinner } from 'react-icons/fa'
 
 interface DeleteModalProps {
