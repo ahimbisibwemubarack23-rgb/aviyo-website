@@ -1,6 +1,6 @@
 // app/(admin)/admin/products/new/page.tsx
-export const runtime = "edge";
 'use client'
+export const runtime = "edge";
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
