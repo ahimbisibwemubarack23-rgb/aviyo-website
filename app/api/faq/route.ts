@@ -1,5 +1,5 @@
-// app/api/faq/route.ts
 export const runtime = "edge";
+// app/api/faq/route.ts
 import { supabaseAdmin } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 
