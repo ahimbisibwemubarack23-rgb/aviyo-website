@@ -1,7 +1,7 @@
 // components/admin/AdminHeader.tsx
 'use client'
 
-import { useState, useEffect } from 'react'
+// import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase/client'
 import { FaBars, FaTimes, FaUser, FaBell } from 'react-icons/fa'
