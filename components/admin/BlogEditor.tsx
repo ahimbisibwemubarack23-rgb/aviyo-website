@@ -1,12 +1,12 @@
 // components/admin/BlogEditor.tsx
 'use client'
 
-import { useState } from 'react'  
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { supabase } from '@/lib/supabase/client'
 import { toast } from 'react-toastify'
-//import { FaSpinner, FaUpload, FaTimes } from 'react-icons/fa'
+import { FaSpinner, FaTimes } from 'react-icons/fa'
 import ImageUpload from './ImageUpload'
 
 interface BlogEditorProps {
@@ -121,7 +121,11 @@ export default function BlogEditor({ initialData, isEditing = false }: BlogEdito
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               placeholder="Enter post title"
             />
-            {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title.message}</p>}
+            {errors.title && (
+              <p className="text-red-500 text-sm mt-1">
+                {String(errors.title.message)}
+              </p>
+            )}
           </div>
 
           <div>
@@ -142,7 +146,11 @@ export default function BlogEditor({ initialData, isEditing = false }: BlogEdito
                 Generate
               </button>
             </div>
-            {errors.slug && <p className="text-red-500 text-sm mt-1">{errors.slug.message}</p>}
+            {errors.slug && (
+              <p className="text-red-500 text-sm mt-1">
+                {String(errors.slug.message)}
+              </p>
+            )}
           </div>
 
           <div>
@@ -167,7 +175,11 @@ export default function BlogEditor({ initialData, isEditing = false }: BlogEdito
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent font-mono"
               placeholder="Write your post content here..."
             />
-            {errors.content && <p className="text-red-500 text-sm mt-1">{errors.content.message}</p>}
+            {errors.content && (
+              <p className="text-red-500 text-sm mt-1">
+                {String(errors.content.message)}
+              </p>
+            )}
           </div>
         </div>
 
