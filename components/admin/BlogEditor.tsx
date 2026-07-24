@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { supabase } from '@/lib/supabase/client'
 import { toast } from 'react-toastify'
-import { FaSpinner, FaUpload, FaTimes } from 'react-icons/fa'
+//import { FaSpinner, FaUpload, FaTimes } from 'react-icons/fa'
 import ImageUpload from './ImageUpload'
 
 interface BlogEditorProps {
