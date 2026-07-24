@@ -1,3 +1,6 @@
+'use client'
+export const runtime = "edge";
+
 
 import { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
@@ -333,7 +336,7 @@ export default function EditProductPage() {
                   type="text"
                   value={newFeature}
                   onChange={(e) => setNewFeature(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && addFeature()}
+                  onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addFeature())}
                   className="flex-1 px-3 py-1 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500"
                   placeholder="Add a feature"
                 />
@@ -433,7 +436,3 @@ export default function EditProductPage() {
     </div>
   )
 }
-
-// app/(admin)/admin/products/[id]/page.tsx
-export const runtime = "edge";
-'use client'
