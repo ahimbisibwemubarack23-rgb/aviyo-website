@@ -1,5 +1,6 @@
 // components/admin/ImageUpload.tsx
 'use client'
+import { toast } from 'react-toastify'
 
 import { useState } from 'react'  // ← Uncomment this line
 import { FaUpload, FaSpinner, FaTimes } from 'react-icons/fa'
