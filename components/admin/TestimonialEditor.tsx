@@ -1,4 +1,3 @@
-[PASTE THE CORRECT TESTIMONIAL EDITOR CODE ABOVE]
 // components/admin/TestimonialEditor.tsx
 'use client'
 
