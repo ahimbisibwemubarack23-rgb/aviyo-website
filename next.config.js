@@ -9,7 +9,6 @@ const nextConfig = {
     formats: ['image/avif', 'image/webp'],
   },
 
-  // Cloudflare Pages requires this
   output: 'standalone',
 
   compiler: {
@@ -20,7 +19,11 @@ const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
 
-  // Redirects
+  // This tells Next.js to use Node.js runtime for the auth route
+  experimental: {
+    serverComponentsExternalPackages: ['next-auth', 'oauth'],
+  },
+
   async redirects() {
     return [
       {
