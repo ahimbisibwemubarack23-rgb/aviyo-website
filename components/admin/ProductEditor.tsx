@@ -1,7 +1,7 @@
 // components/admin/ProductEditor.tsx
 'use client'
 
-import { useState } from 'react'  // ← Add this import
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { supabase } from '@/lib/supabase/client'
@@ -9,7 +9,6 @@ import { toast } from 'react-toastify'
 import { FaSpinner, FaPlus, FaTimes } from 'react-icons/fa'
 import ImageUpload from './ImageUpload'
 
-// ... rest of the file
 interface ProductEditorProps {
   initialData?: any
   isEditing?: boolean
@@ -122,7 +121,11 @@ export default function ProductEditor({ initialData, isEditing = false }: Produc
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               placeholder="Enter product name"
             />
-            {errors.name {String(errors.name && <p className="text-red-500 text-sm mt-1">{errors.name.message)}</p>}{String(errors.name && <p className="text-red-500 text-sm mt-1">{errors.name.message)}</p>} <p className="text-red-500 text-sm mt-1">{String(errors.name.message)}</p>}
+            {errors.name && (
+              <p className="text-red-500 text-sm mt-1">
+                {String(errors.name.message)}
+              </p>
+            )}
           </div>
 
           <div>
@@ -143,7 +146,11 @@ export default function ProductEditor({ initialData, isEditing = false }: Produc
                 Generate
               </button>
             </div>
-            {errors.slug {String(errors.slug && <p className="text-red-500 text-sm mt-1">{errors.slug.message)}</p>}{String(errors.slug && <p className="text-red-500 text-sm mt-1">{errors.slug.message)}</p>} <p className="text-red-500 text-sm mt-1">{String(errors.slug.message)}</p>}
+            {errors.slug && (
+              <p className="text-red-500 text-sm mt-1">
+                {String(errors.slug.message)}
+              </p>
+            )}
           </div>
 
           <div>
@@ -167,7 +174,11 @@ export default function ProductEditor({ initialData, isEditing = false }: Produc
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               placeholder="Detailed product description"
             />
-            {errors.description {String(errors.description && <p className="text-red-500 text-sm mt-1">{errors.description.message)}</p>}{String(errors.description && <p className="text-red-500 text-sm mt-1">{errors.description.message)}</p>} <p className="text-red-500 text-sm mt-1">{String(errors.description.message)}</p>}
+            {errors.description && (
+              <p className="text-red-500 text-sm mt-1">
+                {String(errors.description.message)}
+              </p>
+            )}
           </div>
 
           <div>
