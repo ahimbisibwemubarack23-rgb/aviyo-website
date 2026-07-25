@@ -116,4 +116,4 @@ export default async function BlogPage() {
       </div>
     </div>
   )
-}
+}export const dynamic = 'force-dynamic';

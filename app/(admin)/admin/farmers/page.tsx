@@ -89,4 +89,4 @@ export default async function FarmersManagementPage() {
       </div>
     </div>
   )
-}
+}export const dynamic = 'force-dynamic';

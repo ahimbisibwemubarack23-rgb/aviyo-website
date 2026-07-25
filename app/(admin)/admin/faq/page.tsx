@@ -81,4 +81,4 @@ export default async function FAQManagementPage() {
       </div>
     </div>
   )
-}
+}export const dynamic = 'force-dynamic';

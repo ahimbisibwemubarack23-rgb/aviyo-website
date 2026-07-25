@@ -128,4 +128,4 @@ export default async function ProductsPage() {
       </div>
     </div>
   )
-}
+}export const dynamic = 'force-dynamic';

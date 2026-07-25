@@ -111,4 +111,4 @@ export default async function TeamManagementPage() {
       )}
     </div>
   )
-}
+}export const dynamic = 'force-dynamic';

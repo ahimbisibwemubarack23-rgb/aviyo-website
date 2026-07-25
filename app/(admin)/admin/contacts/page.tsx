@@ -83,4 +83,4 @@ export default async function ContactsManagementPage() {
       </div>
     </div>
   )
-}
+}export const dynamic = 'force-dynamic';

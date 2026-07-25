@@ -102,4 +102,4 @@ export default async function TestimonialsManagementPage() {
       )}
     </div>
   )
-}
+}export const dynamic = 'force-dynamic';

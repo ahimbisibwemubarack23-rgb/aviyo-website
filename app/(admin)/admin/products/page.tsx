@@ -140,4 +140,4 @@ export default async function ProductsManagementPage() {
       </div>
     </div>
   )
-}
+}export const dynamic = 'force-dynamic';
