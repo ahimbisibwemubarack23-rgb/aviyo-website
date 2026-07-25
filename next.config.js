@@ -1,22 +1,4 @@
-// next.config.js
 /** @type {import('next').NextConfig} */
-
-// next.config.js
-/** @type {import('next').NextConfig} */
-const nextConfig = {
-  // ... other config (images, etc.)
-
-  async rewrites() {
-    return [
-      {
-        source: '/api/auth/:path*',
-        destination: 'https://aviyo-auth.ahimbisibwemubarack23.workers.dev/api/auth/:path*',
-      },
-    ];
-  },
-};
-
-module.exports = nextConfig;
 const nextConfig = {
   images: {
     domains: [
@@ -36,7 +18,6 @@ const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
 
-  // This tells Next.js to use Node.js runtime for the auth route
   experimental: {
     serverComponentsExternalPackages: ['next-auth', 'oauth'],
   },
@@ -47,6 +28,15 @@ const nextConfig = {
         source: '/admin',
         destination: '/admin/dashboard',
         permanent: true,
+      },
+    ]
+  },
+
+  async rewrites() {
+    return [
+      {
+        source: '/api/auth/:path*',
+        destination: 'https://aviyo-auth.ahimbisibwemubarack23.workers.dev/api/auth/:path*',
       },
     ]
   },
