@@ -14,6 +14,6 @@ export default function robots(): MetadataRoute.Robots {
         '/_static/',
       ],
     },
-    sitemap: 'https://aviyo.online/sitemap.xml',
+    sitemap: 'https://aviyo-plant-based.pages.dev/sitemap.xml',
   }
 }
