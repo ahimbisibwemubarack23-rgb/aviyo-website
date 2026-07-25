@@ -1,23 +1,28 @@
 // app/sitemap.ts
 import { supabaseAdmin } from '@/lib/supabase/server'
 
-const BASE_URL = 'https://aviyo.online'
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://aviyo-plant-based.pages.dev'
 
 async function getSitemapEntries() {
-  const [products, blogPosts] = await Promise.all([
-    supabaseAdmin
-      .from('products')
-      .select('slug, updated_at')
-      .eq('status', 'published'),
-    supabaseAdmin
-      .from('blog_posts')
-      .select('slug, updated_at')
-      .eq('status', 'published'),
-  ])
+  try {
+    const [products, blogPosts] = await Promise.all([
+      supabaseAdmin
+        .from('products')
+        .select('slug, updated_at')
+        .eq('status', 'published'),
+      supabaseAdmin
+        .from('blog_posts')
+        .select('slug, updated_at')
+        .eq('status', 'published'),
+    ])
 
-  return {
-    products: products.data || [],
-    blogPosts: blogPosts.data || [],
+    return {
+      products: products.data || [],
+      blogPosts: blogPosts.data || [],
+    }
+  } catch (error) {
+    console.error('Error fetching sitemap data:', error)
+    return { products: [], blogPosts: [] }
   }
 }
 
@@ -81,14 +86,14 @@ export default async function sitemap() {
     },
   ]
 
-  const productPages = products.map((product) => ({
+  const productPages = products.map((product: any) => ({
     url: `${BASE_URL}/products/${product.slug}`,
     lastModified: product.updated_at || new Date(),
     changeFrequency: 'weekly' as const,
     priority: 0.8,
   }))
 
-  const blogPages = blogPosts.map((post) => ({
+  const blogPages = blogPosts.map((post: any) => ({
     url: `${BASE_URL}/blog/${post.slug}`,
     lastModified: post.updated_at || new Date(),
     changeFrequency: 'weekly' as const,
