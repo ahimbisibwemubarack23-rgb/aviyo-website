@@ -1,5 +1,6 @@
-export const dynamic = "force-dynamic";
 // app/(admin)/admin/faq/page.tsx
+export const dynamic = "force-dynamic";
+
 import { supabaseAdmin } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { FaPlus, FaEdit, FaTrash, FaArrowUp, FaArrowDown } from 'react-icons/fa'
@@ -82,3 +83,4 @@ export default async function FAQManagementPage() {
       </div>
     </div>
   )
+}

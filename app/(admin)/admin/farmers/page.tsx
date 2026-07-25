@@ -1,5 +1,6 @@
-export const dynamic = "force-dynamic";
 // app/(admin)/admin/farmers/page.tsx
+export const dynamic = "force-dynamic";
+
 import { supabaseAdmin } from '@/lib/supabase/server'
 import { Metadata } from 'next'
 
@@ -90,3 +91,4 @@ export default async function FarmersManagementPage() {
       </div>
     </div>
   )
+}
