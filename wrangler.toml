@@ -2,6 +2,7 @@
 name = "aviyo-website"
 pages_build_output_dir = ".vercel/output/static"
 compatibility_date = "2024-12-18"
+account_id = "d07a42b5b6f26831fec4dea43c83e9dc"
 
 [env.production]
 routes = [
