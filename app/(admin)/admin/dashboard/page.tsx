@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 // app/(admin)/admin/dashboard/page.tsx
 import { supabaseAdmin } from '@/lib/supabase/server'
 import {
@@ -132,4 +133,3 @@ export default async function DashboardPage() {
       </div>
     </div>
   )
-}export const dynamic = 'force-dynamic';

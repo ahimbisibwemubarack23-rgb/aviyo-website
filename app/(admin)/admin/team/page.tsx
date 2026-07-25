@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 // app/(admin)/admin/team/page.tsx
 import { supabaseAdmin } from '@/lib/supabase/server'
 import Link from 'next/link'
@@ -111,4 +112,3 @@ export default async function TeamManagementPage() {
       )}
     </div>
   )
-}export const dynamic = 'force-dynamic';

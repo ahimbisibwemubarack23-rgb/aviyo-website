@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 // app/(admin)/admin/contacts/page.tsx
 import { supabaseAdmin } from '@/lib/supabase/server'
 import { Metadata } from 'next'
@@ -83,4 +84,3 @@ export default async function ContactsManagementPage() {
       </div>
     </div>
   )
-}export const dynamic = 'force-dynamic';

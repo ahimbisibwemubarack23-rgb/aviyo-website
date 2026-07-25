@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 // app/(admin)/admin/blog/page.tsx
 export const dynamic = 'force-dynamic'
 

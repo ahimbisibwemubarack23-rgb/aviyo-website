@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 // app/(admin)/admin/newsletter/page.tsx
 import { supabaseAdmin } from '@/lib/supabase/server'
 import { Metadata } from 'next'
@@ -70,4 +71,3 @@ export default async function NewsletterManagementPage() {
       </div>
     </div>
   )
-}export const dynamic = 'force-dynamic';
