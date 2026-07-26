@@ -9,7 +9,20 @@ export const metadata: Metadata = {
   description: 'Discover Aviyo\'s range of enzyme-enhanced plant-based milks and SuperSoft Chapati flour. Healthy, affordable, and made in Uganda.',
 }
 
-async function getProducts() {
+interface Product {
+  id: string
+  name: string
+  slug: string
+  short_description: string | null
+  price: number | null
+  category: string | null
+  images: string[] | null
+  in_stock: boolean
+  is_featured: boolean
+  status: string
+}
+
+async function getProducts(): Promise<Product[]> {
   const supabase = getSupabaseAdmin()
   if (!supabase) {
     return []
@@ -34,7 +47,7 @@ async function getProducts() {
   }
 }
 
-async function getCategories() {
+async function getCategories(): Promise<string[]> {
   const supabase = getSupabaseAdmin()
   if (!supabase) {
     return []
@@ -52,7 +65,9 @@ async function getCategories() {
       return []
     }
     
-    const categories = [...new Set(data?.map(p => p.category).filter(Boolean) || [])]
+    // Type assertion to handle the data properly
+    const categoryData = data as { category: string }[] | null
+    const categories = [...new Set(categoryData?.map(item => item.category).filter(Boolean) || [])] as string[]
     return categories
   } catch (error) {
     console.error('Error fetching categories:', error)
@@ -103,7 +118,7 @@ export default async function ProductsPage() {
               className="group bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition-all"
             >
               <div className="relative h-56 bg-gray-100">
-                {product.images?.[0] ? (
+                {product.images && product.images.length > 0 ? (
                   <img
                     src={product.images[0]}
                     alt={product.name}
