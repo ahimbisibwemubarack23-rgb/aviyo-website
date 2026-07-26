@@ -60,7 +60,9 @@ async function getCategories(): Promise<string[]> {
       return []
     }
     
-    const categories: string[] = [...new Set(data?.map((f: { category: string }) => f.category).filter(Boolean) || [])]
+    // Type assertion to handle the data properly
+    const categoryData = data as { category: string }[] | null
+    const categories = [...new Set(categoryData?.map(item => item.category).filter(Boolean) || [])] as string[]
     return categories
   } catch (error) {
     console.error('Error fetching categories:', error)
