@@ -11,7 +11,7 @@
     "type-check": "tsc --noEmit",
     "pages:build": "npx @cloudflare/next-on-pages",
     "cf:build": "npm run build && npm run pages:build",
-    "cf:deploy": "npx wrangler pages deploy .vercel/output/static --project-name aviyo-plant-based"
+    "deploy": "npx wrangler pages deploy .vercel/output/static --project-name aviyo-plant-based"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.2",
