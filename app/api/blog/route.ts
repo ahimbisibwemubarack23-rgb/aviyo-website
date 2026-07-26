@@ -1,12 +1,16 @@
 export const runtime = "edge";
-// app/api/blog/route.ts
-import { supabaseAdmin } from '@/lib/supabase/server'
+
+import { getSupabaseAdmin } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 
-// GET - Fetch all published blog posts
 export async function GET() {
   try {
-    const { data, error } = await supabaseAdmin
+    const supabase = getSupabaseAdmin()
+    if (!supabase) {
+      return NextResponse.json([], { status: 200 })
+    }
+    
+    const { data, error } = await supabase
       .from('blog_posts')
       .select('*, users!author_id(full_name)')
       .eq('status', 'published')
@@ -23,12 +27,10 @@ export async function GET() {
   }
 }
 
-// POST - Create a new blog post (admin only)
 export async function POST(request: Request) {
   try {
     const body = await request.json()
     
-    // Validate required fields
     if (!body.title || !body.slug || !body.content) {
       return NextResponse.json(
         { error: 'Title, slug, and content are required' },
@@ -36,7 +38,15 @@ export async function POST(request: Request) {
       )
     }
 
-    const { data, error } = await supabaseAdmin
+    const supabase = getSupabaseAdmin()
+    if (!supabase) {
+      return NextResponse.json(
+        { error: 'Database not available' },
+        { status: 503 }
+      )
+    }
+
+    const { data, error } = await supabase
       .from('blog_posts')
       .insert({
         ...body,

@@ -1,15 +1,22 @@
 export const runtime = "edge";
-// app/api/blog/[id]/route.ts
-import { supabaseAdmin } from '@/lib/supabase/server'
+
+import { getSupabaseAdmin } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 
-// GET - Fetch a single blog post
 export async function GET(
-  _request: Request,  // ← Add underscore to indicate intentionally unused
+  _request: Request,
   { params }: { params: { id: string } }
 ) {
   try {
-    const { data, error } = await supabaseAdmin
+    const supabase = getSupabaseAdmin()
+    if (!supabase) {
+      return NextResponse.json(
+        { error: 'Database not available' },
+        { status: 503 }
+      )
+    }
+    
+    const { data, error } = await supabase
       .from('blog_posts')
       .select('*, users!author_id(full_name)')
       .eq('id', params.id)
@@ -33,15 +40,22 @@ export async function GET(
   }
 }
 
-// PUT - Update a blog post
 export async function PUT(
-  request: Request,  // ← This IS used
+  request: Request,
   { params }: { params: { id: string } }
 ) {
   try {
     const body = await request.json()
 
-    const { data, error } = await supabaseAdmin
+    const supabase = getSupabaseAdmin()
+    if (!supabase) {
+      return NextResponse.json(
+        { error: 'Database not available' },
+        { status: 503 }
+      )
+    }
+
+    const { data, error } = await supabase
       .from('blog_posts')
       .update({
         ...body,
@@ -63,13 +77,20 @@ export async function PUT(
   }
 }
 
-// DELETE - Delete a blog post
 export async function DELETE(
-  _request: Request,  // ← Add underscore to indicate intentionally unused
+  _request: Request,
   { params }: { params: { id: string } }
 ) {
   try {
-    const { error } = await supabaseAdmin
+    const supabase = getSupabaseAdmin()
+    if (!supabase) {
+      return NextResponse.json(
+        { error: 'Database not available' },
+        { status: 503 }
+      )
+    }
+
+    const { error } = await supabase
       .from('blog_posts')
       .delete()
       .eq('id', params.id)
