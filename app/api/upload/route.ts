@@ -30,7 +30,7 @@ export async function POST(request: Request) {
       )
     }
 
-    const supabase = supabaseAdmin
+    const supabase = getSupabaseAdmin()
     if (!supabase) {
       return NextResponse.json(
         { error: 'Database not available' },
@@ -83,7 +83,7 @@ export async function DELETE(request: Request) {
       )
     }
 
-    const supabase = supabaseAdmin
+    const supabase = getSupabaseAdmin()
     if (!supabase) {
       return NextResponse.json(
         { error: 'Database not available' },

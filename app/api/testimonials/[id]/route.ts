@@ -7,7 +7,7 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const supabase = supabaseAdmin
+    const supabase = getSupabaseAdmin()
     if (!supabase) {
       return NextResponse.json(
         { error: 'Database not available' },
@@ -46,7 +46,7 @@ export async function PUT(
   try {
     const body = await request.json()
 
-    const supabase = supabaseAdmin
+    const supabase = getSupabaseAdmin()
     if (!supabase) {
       return NextResponse.json(
         { error: 'Database not available' },
@@ -77,7 +77,7 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const supabase = supabaseAdmin
+    const supabase = getSupabaseAdmin()
     if (!supabase) {
       return NextResponse.json(
         { error: 'Database not available' },

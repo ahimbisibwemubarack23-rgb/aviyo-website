@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server'
 
 export async function GET() {
   try {
-    const supabase = supabaseAdmin
+    const supabase = getSupabaseAdmin()
     if (!supabase) {
       return NextResponse.json([], { status: 200 })
     }
@@ -37,7 +37,7 @@ export async function POST(request: Request) {
       )
     }
 
-    const supabase = supabaseAdmin
+    const supabase = getSupabaseAdmin()
     if (!supabase) {
       return NextResponse.json(
         { error: 'Database not available' },
