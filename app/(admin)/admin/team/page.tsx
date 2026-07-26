@@ -1,16 +1,32 @@
 export const dynamic = "force-dynamic";
-// app/(admin)/admin/team/page.tsx
+
 import { getSupabaseAdmin } from '@/lib/supabase/server'
 import Link from 'next/link'
 import Image from 'next/image'
 import { FaPlus, FaEdit, FaTrash, FaArrowUp, FaArrowDown } from 'react-icons/fa'
 
 async function getTeamMembers() {
-  const { data } = await getSupabaseAdmin()
-    .from('team_members')
-    .select('*')
-    .order('display_order', { ascending: true })
-  return data || []
+  const supabase = getSupabaseAdmin()
+  if (!supabase) {
+    return []
+  }
+  
+  try {
+    const { data, error } = await supabase
+      .from('team_members')
+      .select('*')
+      .order('display_order', { ascending: true })
+    
+    if (error) {
+      console.error('Error fetching team members:', error)
+      return []
+    }
+    
+    return data || []
+  } catch (error) {
+    console.error('Error fetching team members:', error)
+    return []
+  }
 }
 
 export default async function TeamManagementPage() {
@@ -81,15 +97,17 @@ export default async function TeamManagementPage() {
               {member.social_links && (
                 <div className="flex gap-2 mt-3">
                   {Object.entries(member.social_links).map(([platform, url]) => (
-                    <a
-                      key={platform}
-                      href={url as string}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-gray-400 hover:text-primary-500 transition-colors"
-                    >
-                      <span className="text-sm">{platform}</span>
-                    </a>
+                    url && (
+                      <a
+                        key={platform}
+                        href={url as string}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-gray-400 hover:text-primary-500 transition-colors"
+                      >
+                        <span className="text-sm capitalize">{platform}</span>
+                      </a>
+                    )
                   ))}
                 </div>
               )}

@@ -1,16 +1,31 @@
 export const dynamic = "force-dynamic";
-// app/(admin)/admin/faq/page.tsx
 
 import { getSupabaseAdmin } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { FaPlus, FaEdit, FaTrash, FaArrowUp, FaArrowDown } from 'react-icons/fa'
 
 async function getFAQs() {
-  const { data } = await getSupabaseAdmin()
-    .from('faqs')
-    .select('*')
-    .order('display_order', { ascending: true })
-  return data || []
+  const supabase = getSupabaseAdmin()
+  if (!supabase) {
+    return []
+  }
+  
+  try {
+    const { data, error } = await supabase
+      .from('faqs')
+      .select('*')
+      .order('display_order', { ascending: true })
+    
+    if (error) {
+      console.error('Error fetching FAQs:', error)
+      return []
+    }
+    
+    return data || []
+  } catch (error) {
+    console.error('Error fetching FAQs:', error)
+    return []
+  }
 }
 
 export default async function FAQManagementPage() {

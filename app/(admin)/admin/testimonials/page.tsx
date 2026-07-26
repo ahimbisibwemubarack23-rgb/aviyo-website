@@ -1,16 +1,32 @@
 export const dynamic = "force-dynamic";
-// app/(admin)/admin/testimonials/page.tsx
+
 import { getSupabaseAdmin } from '@/lib/supabase/server'
 import Link from 'next/link'
 import Image from 'next/image'
 import { FaPlus, FaEdit, FaTrash, FaStar } from 'react-icons/fa'
 
 async function getTestimonials() {
-  const { data } = await getSupabaseAdmin()
-    .from('testimonials')
-    .select('*')
-    .order('created_at', { ascending: false })
-  return data || []
+  const supabase = getSupabaseAdmin()
+  if (!supabase) {
+    return []
+  }
+  
+  try {
+    const { data, error } = await supabase
+      .from('testimonials')
+      .select('*')
+      .order('created_at', { ascending: false })
+    
+    if (error) {
+      console.error('Error fetching testimonials:', error)
+      return []
+    }
+    
+    return data || []
+  } catch (error) {
+    console.error('Error fetching testimonials:', error)
+    return []
+  }
 }
 
 export default async function TestimonialsManagementPage() {
