@@ -1,9 +1,8 @@
-// app/(auth)/login/page.tsx
 'use client'
 
 import { useState } from 'react'
-import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
+import { supabase } from '@/lib/supabase/client'
 import { FaSpinner } from 'react-icons/fa'
 
 export default function LoginPage() {
@@ -28,20 +27,21 @@ export default function LoginPage() {
     setError('')
 
     try {
-      const result = await signIn('credentials', {
+      const { data, error: authError } = await supabase.auth.signInWithPassword({
         email: formData.email,
         password: formData.password,
-        redirect: false,
       })
 
-      if (result?.error) {
-        setError('Invalid email or password')
+      if (authError) {
+        setError(authError.message || 'Invalid email or password')
         setLoading(false)
         return
       }
 
-      router.push('/admin/dashboard')
-      router.refresh()
+      if (data.user) {
+        router.push('/admin/dashboard')
+        router.refresh()
+      }
     } catch (error) {
       setError('Something went wrong. Please try again.')
       setLoading(false)
