@@ -7,7 +7,16 @@ export const metadata: Metadata = {
   title: 'Contacts | Aviyo Admin',
 }
 
-async function getContacts() {
+interface Contact {
+  id: string
+  name: string
+  email: string
+  subject: string | null
+  status: string
+  created_at: string
+}
+
+async function getContacts(): Promise<Contact[]> {
   const supabase = getSupabaseAdmin()
   if (!supabase) {
     return []

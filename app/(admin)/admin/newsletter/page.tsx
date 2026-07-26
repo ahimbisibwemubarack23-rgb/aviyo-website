@@ -7,7 +7,14 @@ export const metadata: Metadata = {
   title: 'Newsletter | Aviyo Admin',
 }
 
-async function getSubscribers() {
+interface Subscriber {
+  id: string
+  email: string
+  is_active: boolean
+  created_at: string
+}
+
+async function getSubscribers(): Promise<{ subscribers: Subscriber[], count: number }> {
   const supabase = getSupabaseAdmin()
   if (!supabase) {
     return { subscribers: [], count: 0 }

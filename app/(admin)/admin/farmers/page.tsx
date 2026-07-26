@@ -7,7 +7,19 @@ export const metadata: Metadata = {
   title: 'Farmers | Aviyo Admin',
 }
 
-async function getFarmers() {
+interface Farmer {
+  id: string
+  full_name: string
+  phone: string
+  email: string | null
+  district: string | null
+  village: string | null
+  crops: string[] | null
+  status: string
+  created_at: string
+}
+
+async function getFarmers(): Promise<Farmer[]> {
   const supabase = getSupabaseAdmin()
   if (!supabase) {
     return []
