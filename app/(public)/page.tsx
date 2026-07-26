@@ -33,37 +33,8 @@ async function getFeaturedProducts() {
   }
 }
 
-async function getLatestPosts() {
-  const supabase = getSupabaseAdmin()
-  if (!supabase) {
-    return []
-  }
-  
-  try {
-    const { data, error } = await supabase
-      .from('blog_posts')
-      .select('*, users!author_id(full_name)')
-      .eq('status', 'published')
-      .order('published_at', { ascending: false })
-      .limit(3)
-    
-    if (error) {
-      console.error('Error fetching latest posts:', error)
-      return []
-    }
-    
-    return data || []
-  } catch (error) {
-    console.error('Error fetching latest posts:', error)
-    return []
-  }
-}
-
 export default async function HomePage() {
-  const [featuredProducts, latestPosts] = await Promise.all([
-    getFeaturedProducts(),
-    getLatestPosts(),
-  ])
+  const featuredProducts = await getFeaturedProducts()
 
   return (
     <div>
