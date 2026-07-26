@@ -1,4 +1,3 @@
-// hooks/useAuth.ts
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
@@ -64,7 +63,7 @@ export function useAuth() {
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      async (event: string, session: any) => {
         if (event === 'SIGNED_IN' && session) {
           const { data: userData } = await supabase
             .from('users')
