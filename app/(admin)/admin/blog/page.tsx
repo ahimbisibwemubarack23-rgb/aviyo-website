@@ -5,20 +5,27 @@ import Link from 'next/link'
 import { FaPlus, FaEdit, FaTrash, FaEye } from 'react-icons/fa'
 
 async function getBlogPosts() {
+  const supabase = getSupabaseAdmin()
+  
+  // If no client, return empty array during build
+  if (!supabase) {
+    return []
+  }
+  
   try {
-    const supabase = getSupabaseAdmin()
-    if (!supabase) {
-      return []
-    }
-    
-    const result = await supabase
+    const { data, error } = await supabase
       .from('blog_posts')
       .select('*, users!author_id(full_name)')
       .order('created_at', { ascending: false })
     
-    return result.data || []
+    if (error) {
+      console.error('Error fetching blog posts:', error)
+      return []
+    }
+    
+    return data || []
   } catch (error) {
-    console.warn('Error fetching blog posts:', error)
+    console.error('Error fetching blog posts:', error)
     return []
   }
 }

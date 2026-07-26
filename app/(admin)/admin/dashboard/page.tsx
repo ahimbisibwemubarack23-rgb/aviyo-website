@@ -1,6 +1,6 @@
 export const dynamic = "force-dynamic";
 
-import { getSupabaseAdminWithCount } from '@/lib/supabase/server'
+import { getSupabaseAdmin } from '@/lib/supabase/server'
 import {
   FaFileAlt,
   FaBox,
@@ -13,7 +13,8 @@ import {
 } from 'react-icons/fa'
 
 async function getStats() {
-  const supabase = getSupabaseAdminWithCount()
+  const supabase = getSupabaseAdmin()
+  
   if (!supabase) {
     return {
       blog: 0,
@@ -27,35 +28,49 @@ async function getStats() {
     }
   }
 
-  const [
-    blogResult,
-    productResult,
-    teamResult,
-    faqResult,
-    testimonialResult,
-    contactResult,
-    subscriberResult,
-    farmerResult,
-  ] = await Promise.all([
-    supabase.from('blog_posts').select('*', { count: 'exact', head: true }),
-    supabase.from('products').select('*', { count: 'exact', head: true }),
-    supabase.from('team_members').select('*', { count: 'exact', head: true }),
-    supabase.from('faqs').select('*', { count: 'exact', head: true }),
-    supabase.from('testimonials').select('*', { count: 'exact', head: true }),
-    supabase.from('contact_submissions').select('*', { count: 'exact', head: true }),
-    supabase.from('newsletter_subscribers').select('*', { count: 'exact', head: true }),
-    supabase.from('farmer_registrations').select('*', { count: 'exact', head: true }),
-  ])
+  try {
+    const [
+      { count: blogCount },
+      { count: productCount },
+      { count: teamCount },
+      { count: faqCount },
+      { count: testimonialCount },
+      { count: contactCount },
+      { count: subscriberCount },
+      { count: farmerCount },
+    ] = await Promise.all([
+      supabase.from('blog_posts').select('*', { count: 'exact', head: true }),
+      supabase.from('products').select('*', { count: 'exact', head: true }),
+      supabase.from('team_members').select('*', { count: 'exact', head: true }),
+      supabase.from('faqs').select('*', { count: 'exact', head: true }),
+      supabase.from('testimonials').select('*', { count: 'exact', head: true }),
+      supabase.from('contact_submissions').select('*', { count: 'exact', head: true }),
+      supabase.from('newsletter_subscribers').select('*', { count: 'exact', head: true }),
+      supabase.from('farmer_registrations').select('*', { count: 'exact', head: true }),
+    ])
 
-  return {
-    blog: blogResult?.count || 0,
-    products: productResult?.count || 0,
-    team: teamResult?.count || 0,
-    faq: faqResult?.count || 0,
-    testimonials: testimonialResult?.count || 0,
-    contacts: contactResult?.count || 0,
-    subscribers: subscriberResult?.count || 0,
-    farmers: farmerResult?.count || 0,
+    return {
+      blog: blogCount || 0,
+      products: productCount || 0,
+      team: teamCount || 0,
+      faq: faqCount || 0,
+      testimonials: testimonialCount || 0,
+      contacts: contactCount || 0,
+      subscribers: subscriberCount || 0,
+      farmers: farmerCount || 0,
+    }
+  } catch (error) {
+    console.error('Error fetching stats:', error)
+    return {
+      blog: 0,
+      products: 0,
+      team: 0,
+      faq: 0,
+      testimonials: 0,
+      contacts: 0,
+      subscribers: 0,
+      farmers: 0,
+    }
   }
 }
 
