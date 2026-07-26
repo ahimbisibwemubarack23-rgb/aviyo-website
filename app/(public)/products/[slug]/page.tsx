@@ -1,6 +1,6 @@
-export const runtime = "edge";
-// app/(public)/products/[slug]/page.tsx
-import { supabaseAdmin } from '@/lib/supabase/server'
+export const dynamic = "force-dynamic";
+
+import { getSupabaseAdmin } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { Metadata } from 'next'
@@ -10,24 +10,56 @@ type Props = {
 }
 
 async function getProduct(slug: string) {
-  const { data } = await supabaseAdmin
-    .from('products')
-    .select('*')
-    .eq('slug', slug)
-    .eq('status', 'published')
-    .single()
-  return data
+  const supabase = getSupabaseAdmin()
+  if (!supabase) {
+    return null
+  }
+  
+  try {
+    const { data, error } = await supabase
+      .from('products')
+      .select('*')
+      .eq('slug', slug)
+      .eq('status', 'published')
+      .single()
+    
+    if (error) {
+      console.error('Error fetching product:', error)
+      return null
+    }
+    
+    return data
+  } catch (error) {
+    console.error('Error fetching product:', error)
+    return null
+  }
 }
 
 async function getRelatedProducts(category: string, currentId: string) {
-  const { data } = await supabaseAdmin
-    .from('products')
-    .select('*')
-    .eq('category', category)
-    .eq('status', 'published')
-    .neq('id', currentId)
-    .limit(4)
-  return data || []
+  const supabase = getSupabaseAdmin()
+  if (!supabase || !category) {
+    return []
+  }
+  
+  try {
+    const { data, error } = await supabase
+      .from('products')
+      .select('*')
+      .eq('category', category)
+      .eq('status', 'published')
+      .neq('id', currentId)
+      .limit(4)
+    
+    if (error) {
+      console.error('Error fetching related products:', error)
+      return []
+    }
+    
+    return data || []
+  } catch (error) {
+    console.error('Error fetching related products:', error)
+    return []
+  }
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -60,7 +92,6 @@ export default async function ProductDetailPage({ params }: Props) {
   return (
     <div className="pt-24 pb-16 bg-cream-50 min-h-screen">
       <div className="container">
-        {/* Breadcrumb */}
         <nav className="text-sm text-gray-500 mb-8">
           <Link href="/" className="hover:text-primary-500">Home</Link>
           <span className="mx-2">/</span>
@@ -71,7 +102,6 @@ export default async function ProductDetailPage({ params }: Props) {
 
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           <div className="grid md:grid-cols-2 gap-8 p-8">
-            {/* Images */}
             <div>
               <div className="relative aspect-square bg-gray-100 rounded-xl overflow-hidden">
                 {product.images?.[0] ? (
@@ -101,7 +131,6 @@ export default async function ProductDetailPage({ params }: Props) {
               )}
             </div>
 
-            {/* Info */}
             <div>
               <h1 className="font-display text-3xl font-bold text-gray-900 mb-2">
                 {product.name}
@@ -177,7 +206,6 @@ export default async function ProductDetailPage({ params }: Props) {
           </div>
         </div>
 
-        {/* Related Products */}
         {relatedProducts.length > 0 && (
           <div className="mt-16">
             <h2 className="font-display text-2xl font-bold text-gray-900 mb-8">

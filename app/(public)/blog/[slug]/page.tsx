@@ -1,6 +1,6 @@
-export const runtime = "edge";
-// app/(public)/blog/[slug]/page.tsx
-import { supabaseAdmin } from '@/lib/supabase/server'
+export const dynamic = "force-dynamic";
+
+import { getSupabaseAdmin } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { Metadata } from 'next'
@@ -10,24 +10,56 @@ type Props = {
 }
 
 async function getBlogPost(slug: string) {
-  const { data } = await supabaseAdmin
-    .from('blog_posts')
-    .select('*, users!author_id(full_name)')
-    .eq('slug', slug)
-    .eq('status', 'published')
-    .single()
-  return data
+  const supabase = getSupabaseAdmin()
+  if (!supabase) {
+    return null
+  }
+  
+  try {
+    const { data, error } = await supabase
+      .from('blog_posts')
+      .select('*, users!author_id(full_name)')
+      .eq('slug', slug)
+      .eq('status', 'published')
+      .single()
+    
+    if (error) {
+      console.error('Error fetching blog post:', error)
+      return null
+    }
+    
+    return data
+  } catch (error) {
+    console.error('Error fetching blog post:', error)
+    return null
+  }
 }
 
 async function getRelatedPosts(categories: string[], currentId: string) {
-  const { data } = await supabaseAdmin
-    .from('blog_posts')
-    .select('*, users!author_id(full_name)')
-    .eq('status', 'published')
-    .neq('id', currentId)
-    .overlaps('categories', categories)
-    .limit(3)
-  return data || []
+  const supabase = getSupabaseAdmin()
+  if (!supabase || !categories || categories.length === 0) {
+    return []
+  }
+  
+  try {
+    const { data, error } = await supabase
+      .from('blog_posts')
+      .select('*, users!author_id(full_name)')
+      .eq('status', 'published')
+      .neq('id', currentId)
+      .overlaps('categories', categories)
+      .limit(3)
+    
+    if (error) {
+      console.error('Error fetching related posts:', error)
+      return []
+    }
+    
+    return data || []
+  } catch (error) {
+    console.error('Error fetching related posts:', error)
+    return []
+  }
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -69,7 +101,6 @@ export default async function BlogDetailPage({ params }: Props) {
   return (
     <div className="pt-24 pb-16 bg-cream-50 min-h-screen">
       <article className="container max-w-4xl">
-        {/* Breadcrumb */}
         <nav className="text-sm text-gray-500 mb-8">
           <Link href="/" className="hover:text-primary-500">Home</Link>
           <span className="mx-2">/</span>
@@ -78,7 +109,6 @@ export default async function BlogDetailPage({ params }: Props) {
           <span className="text-gray-700">{post.title}</span>
         </nav>
 
-        {/* Article Header */}
         <header className="mb-8">
           <div className="flex flex-wrap gap-2 mb-4">
             {post.categories?.map((category: string) => (
@@ -112,7 +142,6 @@ export default async function BlogDetailPage({ params }: Props) {
           </div>
         </header>
 
-        {/* Featured Image */}
         {post.featured_image && (
           <div className="relative aspect-video mb-8 rounded-xl overflow-hidden bg-gray-100">
             <img
@@ -123,7 +152,6 @@ export default async function BlogDetailPage({ params }: Props) {
           </div>
         )}
 
-        {/* Article Content */}
         <div
           className="prose prose-lg max-w-none 
             prose-headings:text-gray-900 
@@ -140,7 +168,6 @@ export default async function BlogDetailPage({ params }: Props) {
           dangerouslySetInnerHTML={{ __html: post.content }}
         />
 
-        {/* Tags */}
         {post.tags && post.tags.length > 0 && (
           <div className="mt-8 pt-8 border-t border-gray-200">
             <div className="flex flex-wrap gap-2">
@@ -157,7 +184,6 @@ export default async function BlogDetailPage({ params }: Props) {
           </div>
         )}
 
-        {/* Related Posts */}
         {relatedPosts.length > 0 && (
           <div className="mt-12 pt-8 border-t border-gray-200">
             <h3 className="font-display text-xl font-bold text-gray-900 mb-6">
