@@ -8,7 +8,16 @@ export const metadata: Metadata = {
   description: 'Frequently asked questions about Aviyo products, nutrition, and partnership opportunities.',
 }
 
-async function getFAQs() {
+interface FAQ {
+  id: string
+  question: string
+  answer: string
+  category: string | null
+  display_order: number
+  is_active: boolean
+}
+
+async function getFAQs(): Promise<FAQ[]> {
   const supabase = getSupabaseAdmin()
   if (!supabase) {
     return []
@@ -33,7 +42,7 @@ async function getFAQs() {
   }
 }
 
-async function getCategories() {
+async function getCategories(): Promise<string[]> {
   const supabase = getSupabaseAdmin()
   if (!supabase) {
     return []
@@ -51,7 +60,7 @@ async function getCategories() {
       return []
     }
     
-    const categories = [...new Set(data?.map(f => f.category).filter(Boolean) || [])]
+    const categories: string[] = [...new Set(data?.map((f: { category: string }) => f.category).filter(Boolean) || [])]
     return categories
   } catch (error) {
     console.error('Error fetching categories:', error)
@@ -66,7 +75,7 @@ export default async function FAQPage() {
   ])
 
   // Group FAQs by category
-  const groupedFAQs: Record<string, any[]> = {}
+  const groupedFAQs: Record<string, FAQ[]> = {}
   categories.forEach((category: string) => {
     groupedFAQs[category] = faqs.filter(f => f.category === category)
   })
