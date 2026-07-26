@@ -5,7 +5,18 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { FaPlus, FaEdit, FaTrash, FaStar } from 'react-icons/fa'
 
-async function getTestimonials() {
+interface Testimonial {
+  id: string
+  name: string
+  role: string | null
+  photo: string | null
+  quote: string
+  rating: number
+  is_active: boolean
+  created_at: string
+}
+
+async function getTestimonials(): Promise<Testimonial[]> {
   const supabase = getSupabaseAdmin()
   if (!supabase) {
     return []
