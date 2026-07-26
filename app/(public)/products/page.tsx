@@ -1,30 +1,63 @@
-// app/(public)/products/page.tsx
-import { supabaseAdmin } from '@/lib/supabase/server'
+export const dynamic = "force-dynamic";
+
+import { getSupabaseAdmin } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: 'Our Products | Aviyo Plant-Based Nutrition',
-  description: 'Discover Aviyo\'s range of enzyme-enhanced plant-based milks, probiotic yoghuts, floor, composit floor and SuperSoft Chapati flour. Healthy, affordable, and made in Uganda.',
+  description: 'Discover Aviyo\'s range of enzyme-enhanced plant-based milks and SuperSoft Chapati flour. Healthy, affordable, and made in Uganda.',
 }
 
 async function getProducts() {
-  const { data } = await supabaseAdmin
-    .from('products')
-    .select('*')
-    .eq('status', 'published')
-    .order('created_at', { ascending: false })
-  return data || []
+  const supabase = getSupabaseAdmin()
+  if (!supabase) {
+    return []
+  }
+  
+  try {
+    const { data, error } = await supabase
+      .from('products')
+      .select('*')
+      .eq('status', 'published')
+      .order('created_at', { ascending: false })
+    
+    if (error) {
+      console.error('Error fetching products:', error)
+      return []
+    }
+    
+    return data || []
+  } catch (error) {
+    console.error('Error fetching products:', error)
+    return []
+  }
 }
 
 async function getCategories() {
-  const { data } = await supabaseAdmin
-    .from('products')
-    .select('category')
-    .eq('status', 'published')
-    .not('category', 'is', null)
-  const categories = [...new Set(data?.map(p => p.category).filter(Boolean) || [])]
-  return categories
+  const supabase = getSupabaseAdmin()
+  if (!supabase) {
+    return []
+  }
+  
+  try {
+    const { data, error } = await supabase
+      .from('products')
+      .select('category')
+      .eq('status', 'published')
+      .not('category', 'is', null)
+    
+    if (error) {
+      console.error('Error fetching categories:', error)
+      return []
+    }
+    
+    const categories = [...new Set(data?.map(p => p.category).filter(Boolean) || [])]
+    return categories
+  } catch (error) {
+    console.error('Error fetching categories:', error)
+    return []
+  }
 }
 
 export default async function ProductsPage() {
@@ -42,7 +75,7 @@ export default async function ProductsPage() {
           </h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
             Discover our range of enzyme-enhanced plant-based products designed 
-            for health-conscious Ugandans, dairy alternaties, cafein alternaties, child poriage, etc.
+            for health-conscious Ugandans.
           </p>
         </div>
 
@@ -128,4 +161,4 @@ export default async function ProductsPage() {
       </div>
     </div>
   )
-}export const dynamic = 'force-dynamic';
+}

@@ -1,5 +1,6 @@
-// app/(public)/blog/page.tsx
-import { supabaseAdmin } from '@/lib/supabase/server'
+export const dynamic = "force-dynamic";
+
+import { getSupabaseAdmin } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { Metadata } from 'next'
 
@@ -9,24 +10,55 @@ export const metadata: Metadata = {
 }
 
 async function getBlogPosts() {
-  const { data } = await supabaseAdmin
-    .from('blog_posts')
-    .select('*, users!author_id(full_name)')
-    .eq('status', 'published')
-    .order('published_at', { ascending: false })
-  return data || []
+  const supabase = getSupabaseAdmin()
+  if (!supabase) {
+    return []
+  }
+  
+  try {
+    const { data, error } = await supabase
+      .from('blog_posts')
+      .select('*, users!author_id(full_name)')
+      .eq('status', 'published')
+      .order('published_at', { ascending: false })
+    
+    if (error) {
+      console.error('Error fetching blog posts:', error)
+      return []
+    }
+    
+    return data || []
+  } catch (error) {
+    console.error('Error fetching blog posts:', error)
+    return []
+  }
 }
 
 async function getCategories() {
-  const { data } = await supabaseAdmin
-    .from('blog_posts')
-    .select('categories')
-    .eq('status', 'published')
-    .not('categories', 'is', null)
+  const supabase = getSupabaseAdmin()
+  if (!supabase) {
+    return []
+  }
   
-  const allCategories = data?.flatMap(p => p.categories || []) || []
-  const categories = [...new Set(allCategories)]
-  return categories
+  try {
+    const { data, error } = await supabase
+      .from('blog_posts')
+      .select('categories')
+      .eq('status', 'published')
+      .not('categories', 'is', null)
+    
+    if (error) {
+      console.error('Error fetching categories:', error)
+      return []
+    }
+    
+    const allCategories = data?.flatMap(p => p.categories || []) || []
+    const categories = [...new Set(allCategories)]
+    return categories
+  } catch (error) {
+    console.error('Error fetching categories:', error)
+    return []
+  }
 }
 
 export default async function BlogPage() {
@@ -38,7 +70,6 @@ export default async function BlogPage() {
   return (
     <div className="pt-24 pb-16 bg-cream-50 min-h-screen">
       <div className="container">
-        {/* Page Header */}
         <div className="text-center mb-12">
           <h1 className="font-display text-4xl font-bold text-gray-900 mb-4">
             Our Blog
@@ -49,7 +80,6 @@ export default async function BlogPage() {
           </p>
         </div>
 
-        {/* Categories */}
         {categories.length > 0 && (
           <div className="flex flex-wrap gap-2 justify-center mb-8">
             <button className="px-4 py-2 rounded-full bg-primary-500 text-white text-sm font-medium">
@@ -66,7 +96,6 @@ export default async function BlogPage() {
           </div>
         )}
 
-        {/* Blog Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {posts.map((post) => (
             <Link
@@ -116,4 +145,4 @@ export default async function BlogPage() {
       </div>
     </div>
   )
-}export const dynamic = 'force-dynamic';
+}
