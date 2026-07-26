@@ -9,7 +9,27 @@ type Props = {
   params: { slug: string }
 }
 
-async function getBlogPost(slug: string) {
+interface BlogPost {
+  id: string
+  title: string
+  slug: string
+  excerpt: string | null
+  content: string
+  featured_image: string | null
+  categories: string[] | null
+  tags: string[] | null
+  status: string
+  published_at: string
+  created_at: string
+  users?: {
+    full_name: string
+  }
+  seo_title?: string
+  seo_description?: string
+  seo_keywords?: string
+}
+
+async function getBlogPost(slug: string): Promise<BlogPost | null> {
   const supabase = getSupabaseAdmin()
   if (!supabase) {
     return null
@@ -35,7 +55,7 @@ async function getBlogPost(slug: string) {
   }
 }
 
-async function getRelatedPosts(categories: string[], currentId: string) {
+async function getRelatedPosts(categories: string[], currentId: string): Promise<BlogPost[]> {
   const supabase = getSupabaseAdmin()
   if (!supabase || !categories || categories.length === 0) {
     return []
@@ -71,11 +91,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   return {
     title: post.seo_title || post.title,
-    description: post.seo_description || post.excerpt,
-    keywords: post.seo_keywords,
+    description: post.seo_description || post.excerpt || '',
+    keywords: post.seo_keywords || '',
     openGraph: {
       title: post.title,
-      description: post.excerpt,
+      description: post.excerpt || '',
       images: post.featured_image ? [{ url: post.featured_image }] : [],
       publishedTime: post.published_at,
       authors: [post.users?.full_name || 'Aviyo Team'],
@@ -83,7 +103,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     twitter: {
       card: 'summary_large_image',
       title: post.title,
-      description: post.excerpt,
+      description: post.excerpt || '',
       images: post.featured_image ? [post.featured_image] : [],
     },
   }
