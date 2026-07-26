@@ -5,7 +5,19 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { FaPlus, FaEdit, FaTrash, FaEye, FaBox } from 'react-icons/fa'
 
-async function getProducts() {
+interface Product {
+  id: string
+  name: string
+  slug: string
+  short_description: string | null
+  category: string | null
+  price: number | null
+  status: string
+  images: string[] | null
+  created_at: string
+}
+
+async function getProducts(): Promise<Product[]> {
   const supabase = getSupabaseAdmin()
   if (!supabase) {
     return []
@@ -90,7 +102,7 @@ export default async function ProductsManagementPage() {
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
                         <div className="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
-                          {product.images?.[0] ? (
+                          {product.images && product.images.length > 0 ? (
                             <Image
                               src={product.images[0]}
                               alt={product.name}
