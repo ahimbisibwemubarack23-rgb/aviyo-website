@@ -9,7 +9,24 @@ export const metadata: Metadata = {
   description: 'Learn about Aviyo\'s mission to make plant-based nutrition accessible to every Ugandan through enzyme-enhanced, locally sourced products.',
 }
 
-async function getTeamMembers() {
+interface SocialLinks {
+  twitter?: string
+  linkedin?: string
+  instagram?: string
+}
+
+interface TeamMember {
+  id: string
+  name: string
+  role: string
+  bio: string | null
+  photo: string | null
+  social_links: SocialLinks | null
+  display_order: number
+  is_active: boolean
+}
+
+async function getTeamMembers(): Promise<TeamMember[]> {
   const supabase = getSupabaseAdmin()
   if (!supabase) {
     return []
@@ -142,8 +159,9 @@ export default async function AboutPage() {
                     )}
                     {member.social_links && (
                       <div className="flex justify-center gap-3 mt-3">
-                        {Object.entries(member.social_links).map(([platform, url]) => (
-                          url && (
+                        {Object.entries(member.social_links)
+                          .filter(([, url]) => url)
+                          .map(([platform, url]) => (
                             <a
                               key={platform}
                               href={url as string}
@@ -153,8 +171,7 @@ export default async function AboutPage() {
                             >
                               <span className="text-sm capitalize">{platform}</span>
                             </a>
-                          )
-                        ))}
+                          ))}
                       </div>
                     )}
                   </div>
