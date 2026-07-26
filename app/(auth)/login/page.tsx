@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase/client'
 import { FaSpinner } from 'react-icons/fa'
@@ -13,6 +13,17 @@ export default function LoginPage() {
     email: '',
     password: '',
   })
+
+  // Check if user is already logged in
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (session) {
+        router.push('/admin/dashboard')
+      }
+    }
+    checkSession()
+  }, [router])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -38,9 +49,9 @@ export default function LoginPage() {
         return
       }
 
-      if (data.user) {
-        router.push('/admin/dashboard')
-        router.refresh()
+      if (data?.user) {
+        // Force a hard navigation to clear any cached state
+        window.location.href = '/admin/dashboard'
       }
     } catch (error) {
       setError('Something went wrong. Please try again.')
