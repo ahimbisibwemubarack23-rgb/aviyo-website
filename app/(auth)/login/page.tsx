@@ -1,73 +1,52 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { supabase } from '@/lib/supabase/client'
+import { useState } from 'react'
+
+const SUPABASE_URL = 'https://wfwbkwjujlvirxjytihw.supabase.co'
+const SUPABASE_ANON_KEY = 'sb_publishable_0Qel6JKxDnILOks0dyfaDg_22dTuFcf'
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [checking, setChecking] = useState(true)
-
-  useEffect(() => {
-    const checkSession = async () => {
-      if (!supabase) {
-        setChecking(false)
-        return
-      }
-      try {
-        const { data: { session } } = await supabase.auth.getSession()
-        if (session) {
-          window.location.href = '/admin/dashboard'
-        } else {
-          setChecking(false)
-        }
-      } catch (err) {
-        setChecking(false)
-      }
-    }
-    checkSession()
-  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError('')
 
-    if (!supabase) {
-      setError('Database connection error. Please try again later.')
-      setLoading(false)
-      return
-    }
-
     try {
-      const { data, error: authError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+      const response = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_ANON_KEY,
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
       })
 
-      if (authError) {
-        setError(authError.message)
+      const data = await response.json()
+
+      if (!response.ok) {
+        setError(data.message || 'Invalid email or password')
         setLoading(false)
         return
       }
 
-      if (data?.user) {
+      if (data.access_token) {
+        // Store tokens
+        localStorage.setItem('supabase_access_token', data.access_token)
+        localStorage.setItem('supabase_refresh_token', data.refresh_token)
         window.location.href = '/admin/dashboard'
       }
     } catch (err: any) {
-      setError(err.message || 'Something went wrong. Please try again.')
+      setError(err.message || 'Connection error. Please try again.')
       setLoading(false)
     }
-  }
-
-  if (checking) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 via-cream-50 to-white">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
-      </div>
-    )
   }
 
   return (
