@@ -1,7 +1,7 @@
 export const runtime = "edge";
 export const dynamic = "force-dynamic";
 
-import { getSupabaseAdmin } from '@/lib/supabase/server'
+import { supabaseAdmin } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { Metadata } from 'next'
 
@@ -24,7 +24,7 @@ interface BlogPost {
 }
 
 async function getBlogPosts(): Promise<BlogPost[]> {
-  const supabase = getSupabaseAdmin()
+  const supabase = supabaseAdmin
   if (!supabase) {
     return []
   }
@@ -49,7 +49,7 @@ async function getBlogPosts(): Promise<BlogPost[]> {
 }
 
 async function getCategories(): Promise<string[]> {
-  const supabase = getSupabaseAdmin()
+  const supabase = supabaseAdmin
   if (!supabase) {
     return []
   }

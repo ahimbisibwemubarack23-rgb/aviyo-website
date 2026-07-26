@@ -1,7 +1,12 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { supabase } from '@/lib/supabase/client'
+import { createClient } from '@supabase/supabase-js'
+
+// Create client directly with env vars
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false)
@@ -12,10 +17,14 @@ export default function LoginPage() {
 
   useEffect(() => {
     const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (session) {
-        window.location.href = '/admin/dashboard'
-      } else {
+      try {
+        const { data: { session } } = await supabase.auth.getSession()
+        if (session) {
+          window.location.href = '/admin/dashboard'
+        } else {
+          setChecking(false)
+        }
+      } catch (err) {
         setChecking(false)
       }
     }
@@ -42,8 +51,8 @@ export default function LoginPage() {
       if (data?.user) {
         window.location.href = '/admin/dashboard'
       }
-    } catch (err) {
-      setError('Something went wrong. Please try again.')
+    } catch (err: any) {
+      setError(err.message || 'Something went wrong. Please try again.')
       setLoading(false)
     }
   }

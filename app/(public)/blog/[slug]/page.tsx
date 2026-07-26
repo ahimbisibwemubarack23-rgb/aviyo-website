@@ -1,7 +1,7 @@
 export const runtime = "edge";
 export const dynamic = "force-dynamic";
 
-import { getSupabaseAdmin } from '@/lib/supabase/server'
+import { supabaseAdmin } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { Metadata } from 'next'
@@ -31,7 +31,7 @@ interface BlogPost {
 }
 
 async function getBlogPost(slug: string): Promise<BlogPost | null> {
-  const supabase = getSupabaseAdmin()
+  const supabase = supabaseAdmin
   if (!supabase) {
     return null
   }
@@ -57,7 +57,7 @@ async function getBlogPost(slug: string): Promise<BlogPost | null> {
 }
 
 async function getRelatedPosts(categories: string[], currentId: string): Promise<BlogPost[]> {
-  const supabase = getSupabaseAdmin()
+  const supabase = supabaseAdmin
   if (!supabase || !categories || categories.length === 0) {
     return []
   }

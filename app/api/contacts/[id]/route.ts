@@ -1,6 +1,5 @@
 export const runtime = "edge";
 
-import { getSupabaseAdmin } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 
 export async function GET(
@@ -8,7 +7,7 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const supabase = getSupabaseAdmin()
+    const supabase = supabaseAdmin
     if (!supabase) {
       return NextResponse.json(
         { error: 'Database not available' },
@@ -47,7 +46,7 @@ export async function PUT(
   try {
     const body = await request.json()
 
-    const supabase = getSupabaseAdmin()
+    const supabase = supabaseAdmin
     if (!supabase) {
       return NextResponse.json(
         { error: 'Database not available' },
@@ -80,7 +79,7 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const supabase = getSupabaseAdmin()
+    const supabase = supabaseAdmin
     if (!supabase) {
       return NextResponse.json(
         { error: 'Database not available' },

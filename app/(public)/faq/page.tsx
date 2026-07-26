@@ -1,7 +1,7 @@
 export const runtime = "edge";
 export const dynamic = "force-dynamic";
 
-import { getSupabaseAdmin } from '@/lib/supabase/server'
+import { supabaseAdmin } from '@/lib/supabase/server'
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
@@ -19,7 +19,7 @@ interface FAQ {
 }
 
 async function getFAQs(): Promise<FAQ[]> {
-  const supabase = getSupabaseAdmin()
+  const supabase = supabaseAdmin
   if (!supabase) {
     return []
   }
@@ -44,7 +44,7 @@ async function getFAQs(): Promise<FAQ[]> {
 }
 
 async function getCategories(): Promise<string[]> {
-  const supabase = getSupabaseAdmin()
+  const supabase = supabaseAdmin
   if (!supabase) {
     return []
   }

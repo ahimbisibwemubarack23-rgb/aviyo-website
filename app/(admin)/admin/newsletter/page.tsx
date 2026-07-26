@@ -1,7 +1,7 @@
 export const runtime = "edge";
 export const dynamic = "force-dynamic";
 
-import { getSupabaseAdmin } from '@/lib/supabase/server'
+import { supabaseAdmin } from '@/lib/supabase/server'
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
@@ -16,7 +16,7 @@ interface Subscriber {
 }
 
 async function getSubscribers(): Promise<{ subscribers: Subscriber[], count: number }> {
-  const supabase = getSupabaseAdmin()
+  const supabase = supabaseAdmin
   if (!supabase) {
     return { subscribers: [], count: 0 }
   }

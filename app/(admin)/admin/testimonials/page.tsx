@@ -1,7 +1,7 @@
 export const runtime = "edge";
 export const dynamic = "force-dynamic";
 
-import { getSupabaseAdmin } from '@/lib/supabase/server'
+import { supabaseAdmin } from '@/lib/supabase/server'
 import Link from 'next/link'
 import Image from 'next/image'
 import { FaPlus, FaEdit, FaTrash, FaStar } from 'react-icons/fa'
@@ -18,7 +18,7 @@ interface Testimonial {
 }
 
 async function getTestimonials(): Promise<Testimonial[]> {
-  const supabase = getSupabaseAdmin()
+  const supabase = supabaseAdmin
   if (!supabase) {
     return []
   }

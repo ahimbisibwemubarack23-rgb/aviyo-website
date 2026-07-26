@@ -1,7 +1,7 @@
 export const runtime = "edge";
 export const dynamic = "force-dynamic";
 
-import { getSupabaseAdmin } from '@/lib/supabase/server'
+import { supabaseAdmin } from '@/lib/supabase/server'
 import Link from 'next/link'
 import Hero from '@/components/ui/Hero'
 import Newsletter from '@/components/ui/Newsletter'
@@ -18,7 +18,7 @@ interface Product {
 }
 
 async function getFeaturedProducts(): Promise<Product[]> {
-  const supabase = getSupabaseAdmin()
+  const supabase = supabaseAdmin
   if (!supabase) {
     return []
   }
