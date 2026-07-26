@@ -1,15 +1,22 @@
 export const runtime = "edge";
-// app/api/team/[id]/route.ts
-import { supabaseAdmin } from '@/lib/supabase/server'
+
+import { getSupabaseAdmin } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 
-// GET - Fetch a single team member
 export async function GET(
   _request: Request,
   { params }: { params: { id: string } }
 ) {
   try {
-    const { data, error } = await supabaseAdmin
+    const supabase = getSupabaseAdmin()
+    if (!supabase) {
+      return NextResponse.json(
+        { error: 'Database not available' },
+        { status: 503 }
+      )
+    }
+    
+    const { data, error } = await supabase
       .from('team_members')
       .select('*')
       .eq('id', params.id)
@@ -33,7 +40,6 @@ export async function GET(
   }
 }
 
-// PUT - Update a team member
 export async function PUT(
   request: Request,
   { params }: { params: { id: string } }
@@ -41,7 +47,15 @@ export async function PUT(
   try {
     const body = await request.json()
 
-    const { data, error } = await supabaseAdmin
+    const supabase = getSupabaseAdmin()
+    if (!supabase) {
+      return NextResponse.json(
+        { error: 'Database not available' },
+        { status: 503 }
+      )
+    }
+
+    const { data, error } = await supabase
       .from('team_members')
       .update({
         ...body,
@@ -62,13 +76,20 @@ export async function PUT(
   }
 }
 
-// DELETE - Delete a team member
 export async function DELETE(
   _request: Request,
   { params }: { params: { id: string } }
 ) {
   try {
-    const { error } = await supabaseAdmin
+    const supabase = getSupabaseAdmin()
+    if (!supabase) {
+      return NextResponse.json(
+        { error: 'Database not available' },
+        { status: 503 }
+      )
+    }
+
+    const { error } = await supabase
       .from('team_members')
       .delete()
       .eq('id', params.id)

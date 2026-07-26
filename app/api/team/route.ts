@@ -1,12 +1,16 @@
 export const runtime = "edge";
-// app/api/team/route.ts
-import { supabaseAdmin } from '@/lib/supabase/server'
+
+import { getSupabaseAdmin } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 
-// GET - Fetch all team members
 export async function GET() {
   try {
-    const { data, error } = await supabaseAdmin
+    const supabase = getSupabaseAdmin()
+    if (!supabase) {
+      return NextResponse.json([], { status: 200 })
+    }
+    
+    const { data, error } = await supabase
       .from('team_members')
       .select('*')
       .eq('is_active', true)
@@ -23,7 +27,6 @@ export async function GET() {
   }
 }
 
-// POST - Create a new team member (admin only)
 export async function POST(request: Request) {
   try {
     const body = await request.json()
@@ -35,7 +38,15 @@ export async function POST(request: Request) {
       )
     }
 
-    const { data, error } = await supabaseAdmin
+    const supabase = getSupabaseAdmin()
+    if (!supabase) {
+      return NextResponse.json(
+        { error: 'Database not available' },
+        { status: 503 }
+      )
+    }
+
+    const { data, error } = await supabase
       .from('team_members')
       .insert(body)
       .select()

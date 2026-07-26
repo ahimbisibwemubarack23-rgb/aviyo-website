@@ -1,12 +1,16 @@
 export const runtime = "edge";
-// app/api/contacts/route.ts
-import { supabaseAdmin } from '@/lib/supabase/server'
+
+import { getSupabaseAdmin } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 
-// GET - Fetch all contact submissions (admin only)
 export async function GET() {
   try {
-    const { data, error } = await supabaseAdmin
+    const supabase = getSupabaseAdmin()
+    if (!supabase) {
+      return NextResponse.json([], { status: 200 })
+    }
+    
+    const { data, error } = await supabase
       .from('contact_submissions')
       .select('*')
       .order('created_at', { ascending: false })
@@ -22,7 +26,6 @@ export async function GET() {
   }
 }
 
-// POST - Create a new contact submission (public)
 export async function POST(request: Request) {
   try {
     const body = await request.json()
@@ -34,7 +37,15 @@ export async function POST(request: Request) {
       )
     }
 
-    const { error } = await supabaseAdmin  // ← Removed 'data' from here
+    const supabase = getSupabaseAdmin()
+    if (!supabase) {
+      return NextResponse.json(
+        { error: 'Database not available' },
+        { status: 503 }
+      )
+    }
+
+    const { error } = await supabase
       .from('contact_submissions')
       .insert({
         ...body,

@@ -1,6 +1,6 @@
 export const runtime = "edge";
-// app/api/testimonials/[id]/route.ts
-import { supabaseAdmin } from '@/lib/supabase/server'
+
+import { getSupabaseAdmin } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 
 export async function GET(
@@ -8,7 +8,15 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const { data, error } = await supabaseAdmin
+    const supabase = getSupabaseAdmin()
+    if (!supabase) {
+      return NextResponse.json(
+        { error: 'Database not available' },
+        { status: 503 }
+      )
+    }
+    
+    const { data, error } = await supabase
       .from('testimonials')
       .select('*')
       .eq('id', params.id)
@@ -39,7 +47,15 @@ export async function PUT(
   try {
     const body = await request.json()
 
-    const { data, error } = await supabaseAdmin
+    const supabase = getSupabaseAdmin()
+    if (!supabase) {
+      return NextResponse.json(
+        { error: 'Database not available' },
+        { status: 503 }
+      )
+    }
+
+    const { data, error } = await supabase
       .from('testimonials')
       .update(body)
       .eq('id', params.id)
@@ -62,7 +78,15 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const { error } = await supabaseAdmin
+    const supabase = getSupabaseAdmin()
+    if (!supabase) {
+      return NextResponse.json(
+        { error: 'Database not available' },
+        { status: 503 }
+      )
+    }
+
+    const { error } = await supabase
       .from('testimonials')
       .delete()
       .eq('id', params.id)

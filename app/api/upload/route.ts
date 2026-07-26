@@ -1,6 +1,6 @@
 export const runtime = "edge";
-// app/api/upload/route.ts
-import { supabaseAdmin } from '@/lib/supabase/server'
+
+import { getSupabaseAdmin } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 
 export async function POST(request: Request) {
@@ -16,7 +16,6 @@ export async function POST(request: Request) {
       )
     }
 
-    // Validate file type
     const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml']
     if (!allowedTypes.includes(file.type)) {
       return NextResponse.json(
@@ -25,11 +24,18 @@ export async function POST(request: Request) {
       )
     }
 
-    // Validate file size (max 10MB)
     if (file.size > 10 * 1024 * 1024) {
       return NextResponse.json(
         { error: 'File too large. Max size: 10MB' },
         { status: 400 }
+      )
+    }
+
+    const supabase = getSupabaseAdmin()
+    if (!supabase) {
+      return NextResponse.json(
+        { error: 'Database not available' },
+        { status: 503 }
       )
     }
 
@@ -40,7 +46,7 @@ export async function POST(request: Request) {
     const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`
     const filePath = `${folder}/${fileName}`
 
-    const { error: uploadError } = await supabaseAdmin.storage
+    const { error: uploadError } = await supabase.storage
       .from('images')
       .upload(filePath, buffer, {
         contentType: file.type,
@@ -49,7 +55,7 @@ export async function POST(request: Request) {
 
     if (uploadError) throw uploadError
 
-    const { data: { publicUrl } } = supabaseAdmin.storage
+    const { data: { publicUrl } } = supabase.storage
       .from('images')
       .getPublicUrl(filePath)
 
@@ -67,7 +73,6 @@ export async function POST(request: Request) {
   }
 }
 
-// DELETE - Delete a file
 export async function DELETE(request: Request) {
   try {
     const { path } = await request.json()
@@ -79,7 +84,15 @@ export async function DELETE(request: Request) {
       )
     }
 
-    const { error } = await supabaseAdmin.storage
+    const supabase = getSupabaseAdmin()
+    if (!supabase) {
+      return NextResponse.json(
+        { error: 'Database not available' },
+        { status: 503 }
+      )
+    }
+
+    const { error } = await supabase.storage
       .from('images')
       .remove([path])
 

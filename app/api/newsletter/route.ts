@@ -1,12 +1,16 @@
 export const runtime = "edge";
-// app/api/newsletter/route.ts
-import { supabaseAdmin } from '@/lib/supabase/server'
+
+import { getSupabaseAdmin } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 
-// GET - Fetch all newsletter subscribers (admin only)
 export async function GET() {
   try {
-    const { data, error } = await supabaseAdmin
+    const supabase = getSupabaseAdmin()
+    if (!supabase) {
+      return NextResponse.json([], { status: 200 })
+    }
+    
+    const { data, error } = await supabase
       .from('newsletter_subscribers')
       .select('*')
       .eq('is_active', true)
@@ -23,7 +27,6 @@ export async function GET() {
   }
 }
 
-// POST - Subscribe to newsletter (public)
 export async function POST(request: Request) {
   try {
     const { email } = await request.json()
@@ -35,7 +38,15 @@ export async function POST(request: Request) {
       )
     }
 
-    const { error } = await supabaseAdmin  // ← Removed 'data' from here
+    const supabase = getSupabaseAdmin()
+    if (!supabase) {
+      return NextResponse.json(
+        { error: 'Database not available' },
+        { status: 503 }
+      )
+    }
+
+    const { error } = await supabase
       .from('newsletter_subscribers')
       .insert({ email })
 
@@ -61,7 +72,6 @@ export async function POST(request: Request) {
   }
 }
 
-// DELETE - Unsubscribe from newsletter
 export async function DELETE(request: Request) {
   try {
     const { email } = await request.json()
@@ -73,7 +83,15 @@ export async function DELETE(request: Request) {
       )
     }
 
-    const { error } = await supabaseAdmin
+    const supabase = getSupabaseAdmin()
+    if (!supabase) {
+      return NextResponse.json(
+        { error: 'Database not available' },
+        { status: 503 }
+      )
+    }
+
+    const { error } = await supabase
       .from('newsletter_subscribers')
       .update({ is_active: false })
       .eq('email', email)
