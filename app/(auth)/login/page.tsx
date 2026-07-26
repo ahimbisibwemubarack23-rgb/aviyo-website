@@ -3,8 +3,8 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+const supabaseUrl = 'https://wfwbkwjujlvirxjytihw.supabase.co'
+const supabaseAnonKey = 'sb_publishable_0Qel6JKxDnILOks0dyfaDg_22dTuFcf'
 const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 export default function LoginPage() {
@@ -14,7 +14,6 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [checking, setChecking] = useState(true)
 
-  // Check if already logged in
   useEffect(() => {
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession()
@@ -27,7 +26,6 @@ export default function LoginPage() {
     checkSession()
   }, [])
 
-  // Listen for auth changes
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
@@ -65,7 +63,6 @@ export default function LoginPage() {
     }
   }
 
-  // Show loading while checking session
   if (checking) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 via-cream-50 to-white">
