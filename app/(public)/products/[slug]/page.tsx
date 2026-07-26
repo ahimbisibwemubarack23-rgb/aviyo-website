@@ -9,7 +9,27 @@ type Props = {
   params: { slug: string }
 }
 
-async function getProduct(slug: string) {
+interface Product {
+  id: string
+  name: string
+  slug: string
+  description: string
+  short_description: string | null
+  images: string[] | null
+  price: number | null
+  category: string | null
+  features: string[] | null
+  nutrition_info: Record<string, string> | null
+  how_to_use: string | null
+  in_stock: boolean
+  is_featured: boolean
+  status: string
+  created_at: string
+  seo_title?: string
+  seo_description?: string
+}
+
+async function getProduct(slug: string): Promise<Product | null> {
   const supabase = getSupabaseAdmin()
   if (!supabase) {
     return null
@@ -35,9 +55,13 @@ async function getProduct(slug: string) {
   }
 }
 
-async function getRelatedProducts(category: string, currentId: string) {
+async function getRelatedProducts(category: string | null, currentId: string): Promise<Product[]> {
+  if (!category) {
+    return []
+  }
+  
   const supabase = getSupabaseAdmin()
-  if (!supabase || !category) {
+  if (!supabase) {
     return []
   }
   
@@ -104,7 +128,7 @@ export default async function ProductDetailPage({ params }: Props) {
           <div className="grid md:grid-cols-2 gap-8 p-8">
             <div>
               <div className="relative aspect-square bg-gray-100 rounded-xl overflow-hidden">
-                {product.images?.[0] ? (
+                {product.images && product.images.length > 0 ? (
                   <img
                     src={product.images[0]}
                     alt={product.name}
@@ -189,7 +213,7 @@ export default async function ProductDetailPage({ params }: Props) {
                     {Object.entries(product.nutrition_info).map(([key, value]) => (
                       <div key={key} className="flex justify-between">
                         <span className="text-gray-500">{key}</span>
-                        <span className="text-gray-700 font-medium">{value as string}</span>
+                        <span className="text-gray-700 font-medium">{value}</span>
                       </div>
                     ))}
                   </div>
@@ -219,7 +243,7 @@ export default async function ProductDetailPage({ params }: Props) {
                   className="group bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition-all"
                 >
                   <div className="relative h-40 bg-gray-100">
-                    {related.images?.[0] ? (
+                    {related.images && related.images.length > 0 ? (
                       <img
                         src={related.images[0]}
                         alt={related.name}
