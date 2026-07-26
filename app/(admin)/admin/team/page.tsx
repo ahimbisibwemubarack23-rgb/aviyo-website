@@ -5,7 +5,25 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { FaPlus, FaEdit, FaTrash, FaArrowUp, FaArrowDown } from 'react-icons/fa'
 
-async function getTeamMembers() {
+interface SocialLinks {
+  twitter?: string
+  linkedin?: string
+  instagram?: string
+}
+
+interface TeamMember {
+  id: string
+  name: string
+  role: string
+  bio: string | null
+  photo: string | null
+  social_links: SocialLinks | null
+  display_order: number
+  is_active: boolean
+  created_at: string
+}
+
+async function getTeamMembers(): Promise<TeamMember[]> {
   const supabase = getSupabaseAdmin()
   if (!supabase) {
     return []
@@ -96,8 +114,9 @@ export default async function TeamManagementPage() {
               )}
               {member.social_links && (
                 <div className="flex gap-2 mt-3">
-                  {Object.entries(member.social_links).map(([platform, url]) => (
-                    url && (
+                  {Object.entries(member.social_links)
+                    .filter(([, url]) => url)
+                    .map(([platform, url]) => (
                       <a
                         key={platform}
                         href={url as string}
@@ -107,8 +126,7 @@ export default async function TeamManagementPage() {
                       >
                         <span className="text-sm capitalize">{platform}</span>
                       </a>
-                    )
-                  ))}
+                    ))}
                 </div>
               )}
               <div className="mt-3 pt-3 border-t border-gray-100">
