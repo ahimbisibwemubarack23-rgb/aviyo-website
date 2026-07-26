@@ -4,14 +4,14 @@
   "private": true,
   "description": "Aviyo Plant-Based Nutrition",
   "scripts": {
-    "pages:deploy": "npx wrangler pages deploy .vercel/output/static --project-name aviyo-plant-based",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "type-check": "tsc --noEmit",
     "pages:build": "npx @cloudflare/next-on-pages",
-    "cf:build": "npm run build && npm run pages:build"
+    "cf:build": "npm run build && npm run pages:build",
+    "cf:deploy": "npx wrangler pages deploy .vercel/output/static --project-name aviyo-plant-based"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.2",
