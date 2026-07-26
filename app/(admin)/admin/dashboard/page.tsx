@@ -1,6 +1,6 @@
 export const dynamic = "force-dynamic";
 
-import { getSupabaseAdmin } from '@/lib/supabase/server'
+import { getSupabaseAdminWithCount } from '@/lib/supabase/server'
 import {
   FaFileAlt,
   FaBox,
@@ -13,7 +13,7 @@ import {
 } from 'react-icons/fa'
 
 async function getStats() {
-  const supabase = getSupabaseAdmin()
+  const supabase = getSupabaseAdminWithCount()
   if (!supabase) {
     return {
       blog: 0,
@@ -28,14 +28,14 @@ async function getStats() {
   }
 
   const [
-    { data: blogData, count: blogCount },
-    { data: productData, count: productCount },
-    { data: teamData, count: teamCount },
-    { data: faqData, count: faqCount },
-    { data: testimonialData, count: testimonialCount },
-    { data: contactData, count: contactCount },
-    { data: subscriberData, count: subscriberCount },
-    { data: farmerData, count: farmerCount },
+    blogResult,
+    productResult,
+    teamResult,
+    faqResult,
+    testimonialResult,
+    contactResult,
+    subscriberResult,
+    farmerResult,
   ] = await Promise.all([
     supabase.from('blog_posts').select('*', { count: 'exact', head: true }),
     supabase.from('products').select('*', { count: 'exact', head: true }),
@@ -48,14 +48,14 @@ async function getStats() {
   ])
 
   return {
-    blog: blogCount || 0,
-    products: productCount || 0,
-    team: teamCount || 0,
-    faq: faqCount || 0,
-    testimonials: testimonialCount || 0,
-    contacts: contactCount || 0,
-    subscribers: subscriberCount || 0,
-    farmers: farmerCount || 0,
+    blog: blogResult?.count || 0,
+    products: productResult?.count || 0,
+    team: teamResult?.count || 0,
+    faq: faqResult?.count || 0,
+    testimonials: testimonialResult?.count || 0,
+    contacts: contactResult?.count || 0,
+    subscribers: subscriberResult?.count || 0,
+    farmers: farmerResult?.count || 0,
   }
 }
 
@@ -103,7 +103,6 @@ export default async function DashboardPage() {
         ))}
       </div>
 
-      {/* Quick Actions */}
       <div className="mt-12">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
