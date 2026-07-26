@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
 
-// Use the proxied URL instead of direct Supabase URL
-const supabaseUrl = '/api/supabase'
-const supabaseAnonKey = 'sb_publishable_0Qel6JKxDnILOks0dyfaDg_22dTuFcf'
+// Use environment variables (set in Cloudflare Pages)
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
