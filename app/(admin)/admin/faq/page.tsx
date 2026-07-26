@@ -1,12 +1,12 @@
 export const dynamic = "force-dynamic";
 // app/(admin)/admin/faq/page.tsx
 
-import { supabaseAdmin } from '@/lib/supabase/server'
+import { getSupabaseAdmin } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { FaPlus, FaEdit, FaTrash, FaArrowUp, FaArrowDown } from 'react-icons/fa'
 
 async function getFAQs() {
-  const { data } = await supabaseAdmin
+  const { data } = await getSupabaseAdmin()
     .from('faqs')
     .select('*')
     .order('display_order', { ascending: true })

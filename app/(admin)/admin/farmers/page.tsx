@@ -1,7 +1,7 @@
 export const dynamic = "force-dynamic";
 // app/(admin)/admin/farmers/page.tsx
 
-import { supabaseAdmin } from '@/lib/supabase/server'
+import { getSupabaseAdmin } from '@/lib/supabase/server'
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 }
 
 async function getFarmers() {
-  const { data } = await supabaseAdmin
+  const { data } = await getSupabaseAdmin()
     .from('farmer_registrations')
     .select('*')
     .order('created_at', { ascending: false })

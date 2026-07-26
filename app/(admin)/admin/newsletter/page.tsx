@@ -1,7 +1,7 @@
 export const dynamic = "force-dynamic";
 // app/(admin)/admin/newsletter/page.tsx
 
-import { supabaseAdmin } from '@/lib/supabase/server'
+import { getSupabaseAdmin } from '@/lib/supabase/server'
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 }
 
 async function getSubscribers() {
-  const { data, count } = await supabaseAdmin
+  const { data, count } = await getSupabaseAdmin()
     .from('newsletter_subscribers')
     .select('*', { count: 'exact' })
     .order('created_at', { ascending: false })

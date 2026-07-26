@@ -1,13 +1,13 @@
 export const dynamic = "force-dynamic";
 // app/(admin)/admin/products/page.tsx
 
-import { supabaseAdmin } from '@/lib/supabase/server'
+import { getSupabaseAdmin } from '@/lib/supabase/server'
 import Link from 'next/link'
 import Image from 'next/image'
 import { FaPlus, FaEdit, FaTrash, FaEye, FaBox } from 'react-icons/fa'
 
 async function getProducts() {
-  const { data } = await supabaseAdmin
+  const { data } = await getSupabaseAdmin()
     .from('products')
     .select('*')
     .order('created_at', { ascending: false })

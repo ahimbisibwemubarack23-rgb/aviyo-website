@@ -1,12 +1,12 @@
 export const dynamic = "force-dynamic";
 // app/(admin)/admin/testimonials/page.tsx
-import { supabaseAdmin } from '@/lib/supabase/server'
+import { getSupabaseAdmin } from '@/lib/supabase/server'
 import Link from 'next/link'
 import Image from 'next/image'
 import { FaPlus, FaEdit, FaTrash, FaStar } from 'react-icons/fa'
 
 async function getTestimonials() {
-  const { data } = await supabaseAdmin
+  const { data } = await getSupabaseAdmin()
     .from('testimonials')
     .select('*')
     .order('created_at', { ascending: false })

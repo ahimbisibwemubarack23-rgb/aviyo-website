@@ -1,6 +1,6 @@
 export const dynamic = "force-dynamic";
 // app/(admin)/admin/dashboard/page.tsx
-import { supabaseAdmin } from '@/lib/supabase/server'
+import { getSupabaseAdmin } from '@/lib/supabase/server'
 import {
   FaFileAlt,
   FaBox,
@@ -23,14 +23,14 @@ async function getStats() {
     { count: subscriberCount },
     { count: farmerCount },
   ] = await Promise.all([
-    supabaseAdmin.from('blog_posts').select('*', { count: 'exact', head: true }),
-    supabaseAdmin.from('products').select('*', { count: 'exact', head: true }),
-    supabaseAdmin.from('team_members').select('*', { count: 'exact', head: true }),
-    supabaseAdmin.from('faqs').select('*', { count: 'exact', head: true }),
-    supabaseAdmin.from('testimonials').select('*', { count: 'exact', head: true }),
-    supabaseAdmin.from('contact_submissions').select('*', { count: 'exact', head: true }),
-    supabaseAdmin.from('newsletter_subscribers').select('*', { count: 'exact', head: true }),
-    supabaseAdmin.from('farmer_registrations').select('*', { count: 'exact', head: true }),
+    getSupabaseAdmin().from('blog_posts').select('*', { count: 'exact', head: true }),
+    getSupabaseAdmin().from('products').select('*', { count: 'exact', head: true }),
+    getSupabaseAdmin().from('team_members').select('*', { count: 'exact', head: true }),
+    getSupabaseAdmin().from('faqs').select('*', { count: 'exact', head: true }),
+    getSupabaseAdmin().from('testimonials').select('*', { count: 'exact', head: true }),
+    getSupabaseAdmin().from('contact_submissions').select('*', { count: 'exact', head: true }),
+    getSupabaseAdmin().from('newsletter_subscribers').select('*', { count: 'exact', head: true }),
+    getSupabaseAdmin().from('farmer_registrations').select('*', { count: 'exact', head: true }),
   ])
 
   return {

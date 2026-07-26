@@ -1,12 +1,16 @@
 export const dynamic = "force-dynamic";
-// app/(admin)/admin/blog/page.tsx
 
-import { supabaseAdmin } from '@/lib/supabase/server'
+import { getSupabaseAdmin } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { FaPlus, FaEdit, FaTrash, FaEye } from 'react-icons/fa'
 
 async function getBlogPosts() {
-  const { data } = await supabaseAdmin
+  const supabase = getSupabaseAdmin()
+  if (!supabase) {
+    return []
+  }
+  
+  const { data } = await supabase
     .from('blog_posts')
     .select('*, users!author_id(full_name)')
     .order('created_at', { ascending: false })
