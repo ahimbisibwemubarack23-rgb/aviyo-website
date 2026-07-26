@@ -9,7 +9,20 @@ export const metadata: Metadata = {
   description: 'Read the latest news, research, and stories about plant-based nutrition, health, and sustainability in Uganda.',
 }
 
-async function getBlogPosts() {
+interface BlogPost {
+  id: string
+  title: string
+  slug: string
+  excerpt: string | null
+  featured_image: string | null
+  categories: string[] | null
+  published_at: string
+  users?: {
+    full_name: string
+  }
+}
+
+async function getBlogPosts(): Promise<BlogPost[]> {
   const supabase = getSupabaseAdmin()
   if (!supabase) {
     return []
@@ -34,7 +47,7 @@ async function getBlogPosts() {
   }
 }
 
-async function getCategories() {
+async function getCategories(): Promise<string[]> {
   const supabase = getSupabaseAdmin()
   if (!supabase) {
     return []
@@ -52,7 +65,7 @@ async function getCategories() {
       return []
     }
     
-    const allCategories = data?.flatMap(p => p.categories || []) || []
+    const allCategories: string[] = data?.flatMap((p: { categories: string[] }) => p.categories || []) || []
     const categories = [...new Set(allCategories)]
     return categories
   } catch (error) {
