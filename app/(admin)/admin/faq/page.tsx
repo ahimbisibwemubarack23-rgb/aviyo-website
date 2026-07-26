@@ -4,7 +4,16 @@ import { getSupabaseAdmin } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { FaPlus, FaEdit, FaTrash, FaArrowUp, FaArrowDown } from 'react-icons/fa'
 
-async function getFAQs() {
+interface FAQ {
+  id: string
+  question: string
+  answer: string
+  category: string | null
+  display_order: number
+  is_active: boolean
+}
+
+async function getFAQs(): Promise<FAQ[]> {
   const supabase = getSupabaseAdmin()
   if (!supabase) {
     return []
