@@ -1,4 +1,10 @@
 # wrangler.toml
 name = "aviyo-plant-based"
 pages_build_output_dir = ".vercel/output/static"
-compatibility_date = "2024-12-18"
+compatibility_date = "2024-09-23"
+compatibility_flags = ["nodejs_compat"]
+
+[env.production]
+routes = [
+  { pattern = "/api/auth/*", runtime = "nodejs" }
+]
