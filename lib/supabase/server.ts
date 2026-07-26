@@ -14,84 +14,47 @@ export const getSupabaseAdmin = () => {
   if (!supabaseAdmin) {
     console.warn('⚠️ Supabase admin client not available (missing env vars). Returning mock for build.')
     
-    // Create a mock that mimics the Supabase client API
-    const createMockQuery = () => {
-      let query = {
-        data: [],
-        error: null,
-        count: 0,
+    // Simple mock that returns empty data for all operations
+    const emptyData = { data: [], error: null }
+    
+    // Create a chainable mock
+    const createChainable = () => {
+      const chainable = {
+        select: (fields: any = '*', options: any = {}) => {
+          // For count queries, return empty result
+          if (options && options.count === 'exact') {
+            return Promise.resolve({ data: null, count: 0, error: null })
+          }
+          // Return the chainable for further chaining
+          return chainable
+        },
+        order: (column: any = '', options: any = {}) => {
+          return chainable
+        },
+        eq: (column: any = '', value: any = {}) => {
+          return chainable
+        },
+        single: () => {
+          return Promise.resolve({ data: null, error: null })
+        },
+        insert: (data: any) => {
+          return Promise.resolve({ data: null, error: null })
+        },
+        update: (data: any) => {
+          return chainable
+        },
+        delete: () => {
+          return chainable
+        },
+        then: (resolve: any) => {
+          resolve(emptyData)
+        },
       }
-
-      const execute = () => Promise.resolve(query)
-
-      const order = (column: string, options: any = {}) => {
-        // Mock ordering - just return the same mock
-        return mockBuilder
-      }
-
-      const eq = (column: string, value: any) => {
-        return mockBuilder
-      }
-
-      const single = () => {
-        return Promise.resolve({ data: null, error: null })
-      }
-
-      const select = (fields: string = '*', options: any = {}) => {
-        if (options && options.count === 'exact') {
-          // Return a Promise with count
-          return Promise.resolve({ data: null, count: 0, error: null })
-        }
-        // Return a builder with order method
-        return {
-          order: order,
-          eq: eq,
-          single: single,
-          then: (resolve: any) => resolve({ data: [], error: null }),
-        }
-      }
-
-      const insert = (data: any) => {
-        return Promise.resolve({ data: null, error: null })
-      }
-
-      const update = (data: any) => {
-        return {
-          eq: (column: string, value: any) => ({
-            select: (fields: string = '*') => ({
-              single: () => Promise.resolve({ data: null, error: null }),
-              order: (column: string, options: any = {}) => ({
-                data: [],
-                error: null,
-                then: (resolve: any) => resolve({ data: [], error: null }),
-              }),
-            }),
-          }),
-        }
-      }
-
-      const del = () => {
-        return {
-          eq: (column: string, value: any) => Promise.resolve({ data: null, error: null }),
-        }
-      }
-
-      const mockBuilder = {
-        select: select,
-        order: order,
-        eq: eq,
-        single: single,
-        insert: insert,
-        update: update,
-        delete: del,
-        then: (resolve: any) => resolve({ data: [], error: null }),
-      }
-
-      return mockBuilder
+      return chainable
     }
 
     return {
-      from: (table: string) => createMockQuery(),
+      from: (table: string) => createChainable(),
     }
   }
   return supabaseAdmin
