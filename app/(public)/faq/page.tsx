@@ -1,5 +1,6 @@
-// app/(public)/faq/page.tsx
-import { supabaseAdmin } from '@/lib/supabase/server'
+export const dynamic = "force-dynamic";
+
+import { getSupabaseAdmin } from '@/lib/supabase/server'
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
@@ -8,22 +9,54 @@ export const metadata: Metadata = {
 }
 
 async function getFAQs() {
-  const { data } = await supabaseAdmin
-    .from('faqs')
-    .select('*')
-    .eq('is_active', true)
-    .order('display_order', { ascending: true })
-  return data || []
+  const supabase = getSupabaseAdmin()
+  if (!supabase) {
+    return []
+  }
+  
+  try {
+    const { data, error } = await supabase
+      .from('faqs')
+      .select('*')
+      .eq('is_active', true)
+      .order('display_order', { ascending: true })
+    
+    if (error) {
+      console.error('Error fetching FAQs:', error)
+      return []
+    }
+    
+    return data || []
+  } catch (error) {
+    console.error('Error fetching FAQs:', error)
+    return []
+  }
 }
 
 async function getCategories() {
-  const { data } = await supabaseAdmin
-    .from('faqs')
-    .select('category')
-    .eq('is_active', true)
-    .not('category', 'is', null)
-  const categories = [...new Set(data?.map(f => f.category).filter(Boolean) || [])]
-  return categories
+  const supabase = getSupabaseAdmin()
+  if (!supabase) {
+    return []
+  }
+  
+  try {
+    const { data, error } = await supabase
+      .from('faqs')
+      .select('category')
+      .eq('is_active', true)
+      .not('category', 'is', null)
+    
+    if (error) {
+      console.error('Error fetching categories:', error)
+      return []
+    }
+    
+    const categories = [...new Set(data?.map(f => f.category).filter(Boolean) || [])]
+    return categories
+  } catch (error) {
+    console.error('Error fetching categories:', error)
+    return []
+  }
 }
 
 export default async function FAQPage() {
@@ -33,18 +66,16 @@ export default async function FAQPage() {
   ])
 
   // Group FAQs by category
-  const groupedFAQs = categories.reduce((acc: any, category: string) => {
-    acc[category] = faqs.filter(f => f.category === category)
-    return acc
-  }, {})
+  const groupedFAQs: Record<string, any[]> = {}
+  categories.forEach((category: string) => {
+    groupedFAQs[category] = faqs.filter(f => f.category === category)
+  })
   
-  // Uncategorized FAQs
   const uncategorized = faqs.filter(f => !f.category)
 
   return (
     <div className="pt-24 pb-16 bg-cream-50 min-h-screen">
       <div className="container max-w-4xl">
-        {/* Header */}
         <div className="text-center mb-12">
           <h1 className="font-display text-4xl font-bold text-gray-900 mb-4">
             Frequently Asked Questions
@@ -55,7 +86,6 @@ export default async function FAQPage() {
         </div>
 
         <div className="space-y-8">
-          {/* Uncategorized FAQs */}
           {uncategorized.length > 0 && (
             <div className="space-y-4">
               {uncategorized.map((faq) => (
@@ -76,14 +106,13 @@ export default async function FAQPage() {
             </div>
           )}
 
-          {/* Grouped FAQs by Category */}
           {categories.map((category: string) => (
             <div key={category}>
               <h2 className="font-display text-2xl font-bold text-gray-900 mb-4">
                 {category}
               </h2>
               <div className="space-y-4">
-                {groupedFAQs[category].map((faq: any) => (
+                {groupedFAQs[category].map((faq) => (
                   <div key={faq.id} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
                     <details className="group">
                       <summary className="flex items-center justify-between p-6 cursor-pointer hover:bg-gray-50 transition-colors">
@@ -109,7 +138,6 @@ export default async function FAQPage() {
           )}
         </div>
 
-        {/* Still have questions? */}
         <div className="mt-12 bg-primary-50 rounded-2xl p-8 text-center">
           <h3 className="font-display text-xl font-bold text-gray-900 mb-2">
             Still have questions?
