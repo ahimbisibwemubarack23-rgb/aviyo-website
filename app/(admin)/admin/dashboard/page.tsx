@@ -1,5 +1,5 @@
 export const dynamic = "force-dynamic";
-// app/(admin)/admin/dashboard/page.tsx
+
 import { getSupabaseAdmin } from '@/lib/supabase/server'
 import {
   FaFileAlt,
@@ -13,24 +13,38 @@ import {
 } from 'react-icons/fa'
 
 async function getStats() {
+  const supabase = getSupabaseAdmin()
+  if (!supabase) {
+    return {
+      blog: 0,
+      products: 0,
+      team: 0,
+      faq: 0,
+      testimonials: 0,
+      contacts: 0,
+      subscribers: 0,
+      farmers: 0,
+    }
+  }
+
   const [
-    { count: blogCount },
-    { count: productCount },
-    { count: teamCount },
-    { count: faqCount },
-    { count: testimonialCount },
-    { count: contactCount },
-    { count: subscriberCount },
-    { count: farmerCount },
+    { data: blogData, count: blogCount },
+    { data: productData, count: productCount },
+    { data: teamData, count: teamCount },
+    { data: faqData, count: faqCount },
+    { data: testimonialData, count: testimonialCount },
+    { data: contactData, count: contactCount },
+    { data: subscriberData, count: subscriberCount },
+    { data: farmerData, count: farmerCount },
   ] = await Promise.all([
-    getSupabaseAdmin().from('blog_posts').select('*', { count: 'exact', head: true }),
-    getSupabaseAdmin().from('products').select('*', { count: 'exact', head: true }),
-    getSupabaseAdmin().from('team_members').select('*', { count: 'exact', head: true }),
-    getSupabaseAdmin().from('faqs').select('*', { count: 'exact', head: true }),
-    getSupabaseAdmin().from('testimonials').select('*', { count: 'exact', head: true }),
-    getSupabaseAdmin().from('contact_submissions').select('*', { count: 'exact', head: true }),
-    getSupabaseAdmin().from('newsletter_subscribers').select('*', { count: 'exact', head: true }),
-    getSupabaseAdmin().from('farmer_registrations').select('*', { count: 'exact', head: true }),
+    supabase.from('blog_posts').select('*', { count: 'exact', head: true }),
+    supabase.from('products').select('*', { count: 'exact', head: true }),
+    supabase.from('team_members').select('*', { count: 'exact', head: true }),
+    supabase.from('faqs').select('*', { count: 'exact', head: true }),
+    supabase.from('testimonials').select('*', { count: 'exact', head: true }),
+    supabase.from('contact_submissions').select('*', { count: 'exact', head: true }),
+    supabase.from('newsletter_subscribers').select('*', { count: 'exact', head: true }),
+    supabase.from('farmer_registrations').select('*', { count: 'exact', head: true }),
   ])
 
   return {
