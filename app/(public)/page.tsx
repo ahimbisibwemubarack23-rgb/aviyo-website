@@ -7,7 +7,16 @@ import Newsletter from '@/components/ui/Newsletter'
 import Testimonials from '@/components/ui/Testimonials'
 import WhyAviyo from '@/components/ui/WhyAviyo'
 
-async function getFeaturedProducts() {
+interface Product {
+  id: string
+  name: string
+  slug: string
+  short_description: string | null
+  price: number | null
+  images: string[] | null
+}
+
+async function getFeaturedProducts(): Promise<Product[]> {
   const supabase = getSupabaseAdmin()
   if (!supabase) {
     return []
@@ -61,7 +70,7 @@ export default async function HomePage() {
                   className="group bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition-all"
                 >
                   <div className="relative h-48 bg-gray-100">
-                    {product.images?.[0] ? (
+                    {product.images && product.images.length > 0 ? (
                       <img
                         src={product.images[0]}
                         alt={product.name}
