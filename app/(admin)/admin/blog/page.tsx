@@ -1,6 +1,5 @@
 export const dynamic = "force-dynamic";
 // app/(admin)/admin/blog/page.tsx
-export const dynamic = 'force-dynamic'
 
 import { getSupabaseAdmin } from '@/lib/supabase/server'
 import Link from 'next/link'
@@ -132,4 +131,3 @@ export default async function BlogManagementPage() {
       </div>
     </div>
   )
-}export const dynamic = 'force-dynamic';

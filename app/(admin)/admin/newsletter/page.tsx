@@ -1,5 +1,5 @@
-// app/(admin)/admin/newsletter/page.tsx
 export const dynamic = "force-dynamic";
+// app/(admin)/admin/newsletter/page.tsx
 
 import { supabaseAdmin } from '@/lib/supabase/server'
 import { Metadata } from 'next'
