@@ -9,66 +9,95 @@ export const supabaseAdmin = supabaseUrl && supabaseServiceKey
   ? createClient(supabaseUrl, supabaseServiceKey)
   : null
 
-// Mock data for build time
-const emptyResult = { data: [], error: null, count: 0 }
-
 // For server components that might be called during build
 export const getSupabaseAdmin = () => {
   if (!supabaseAdmin) {
     console.warn('⚠️ Supabase admin client not available (missing env vars). Returning mock for build.')
-    // Return a mock client that won't error during build
-    return {
-      from: (table: string) => ({
-        select: (fields: string = '*', options: any = {}) => {
-          // If count option is provided, return count
-          if (options && options.count === 'exact') {
-            // For head: true, return just count
-            if (options.head === true) {
-              return Promise.resolve({ data: null, count: 0, error: null })
-            }
-            return Promise.resolve({ data: [], count: 0, error: null })
-          }
-          // Regular select with no count
-          return {
-            order: (column: string, options: any = {}) => {
-              return {
-                data: [],
-                error: null,
-                then: (resolve: any) => resolve({ data: [], error: null }),
-              }
-            },
-            single: () => Promise.resolve({ data: null, error: null }),
-            eq: (column: string, value: any) => ({
-              single: () => Promise.resolve({ data: null, error: null }),
-              select: (fields: string = '*') => ({
-                order: (column: string, options: any = {}) => ({
-                  data: [],
-                  error: null,
-                  then: (resolve: any) => resolve({ data: [], error: null }),
-                }),
-              }),
-            }),
-            then: (resolve: any) => resolve({ data: [], error: null }),
-          }
-        },
-        insert: (data: any) => Promise.resolve({ data: null, error: null }),
-        update: (data: any) => ({
+    
+    // Create a mock that mimics the Supabase client API
+    const createMockQuery = () => {
+      let query = {
+        data: [],
+        error: null,
+        count: 0,
+      }
+
+      const execute = () => Promise.resolve(query)
+
+      const order = (column: string, options: any = {}) => {
+        // Mock ordering - just return the same mock
+        return mockBuilder
+      }
+
+      const eq = (column: string, value: any) => {
+        return mockBuilder
+      }
+
+      const single = () => {
+        return Promise.resolve({ data: null, error: null })
+      }
+
+      const select = (fields: string = '*', options: any = {}) => {
+        if (options && options.count === 'exact') {
+          // Return a Promise with count
+          return Promise.resolve({ data: null, count: 0, error: null })
+        }
+        // Return a builder with order method
+        return {
+          order: order,
+          eq: eq,
+          single: single,
+          then: (resolve: any) => resolve({ data: [], error: null }),
+        }
+      }
+
+      const insert = (data: any) => {
+        return Promise.resolve({ data: null, error: null })
+      }
+
+      const update = (data: any) => {
+        return {
           eq: (column: string, value: any) => ({
             select: (fields: string = '*') => ({
               single: () => Promise.resolve({ data: null, error: null }),
+              order: (column: string, options: any = {}) => ({
+                data: [],
+                error: null,
+                then: (resolve: any) => resolve({ data: [], error: null }),
+              }),
             }),
           }),
-        }),
-        delete: () => ({
+        }
+      }
+
+      const del = () => {
+        return {
           eq: (column: string, value: any) => Promise.resolve({ data: null, error: null }),
-        }),
-      }),
+        }
+      }
+
+      const mockBuilder = {
+        select: select,
+        order: order,
+        eq: eq,
+        single: single,
+        insert: insert,
+        update: update,
+        delete: del,
+        then: (resolve: any) => resolve({ data: [], error: null }),
+      }
+
+      return mockBuilder
+    }
+
+    return {
+      from: (table: string) => createMockQuery(),
     }
   }
   return supabaseAdmin
 }
 
-// For getting counts in dashboard - returns a simpler mock
+// For getting counts in dashboard
 export const getSupabaseAdminWithCount = () => {
   if (!supabaseAdmin) {
     console.warn('⚠️ Supabase admin client not available (missing env vars). Returning mock for build.')

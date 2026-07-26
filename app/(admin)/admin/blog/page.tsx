@@ -10,11 +10,16 @@ async function getBlogPosts() {
     return []
   }
   
-  const { data } = await supabase
-    .from('blog_posts')
-    .select('*, users!author_id(full_name)')
-    .order('created_at', { ascending: false })
-  return data || []
+  try {
+    const { data } = await supabase
+      .from('blog_posts')
+      .select('*, users!author_id(full_name)')
+      .order('created_at', { ascending: false })
+    return data || []
+  } catch (error) {
+    console.warn('Error fetching blog posts:', error)
+    return []
+  }
 }
 
 export default async function BlogManagementPage() {
