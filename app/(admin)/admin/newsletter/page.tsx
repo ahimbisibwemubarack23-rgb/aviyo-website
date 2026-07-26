@@ -1,5 +1,4 @@
 export const dynamic = "force-dynamic";
-// app/(admin)/admin/newsletter/page.tsx
 
 import { getSupabaseAdmin } from '@/lib/supabase/server'
 import { Metadata } from 'next'
@@ -9,11 +8,27 @@ export const metadata: Metadata = {
 }
 
 async function getSubscribers() {
-  const { data, count } = await getSupabaseAdmin()
-    .from('newsletter_subscribers')
-    .select('*', { count: 'exact' })
-    .order('created_at', { ascending: false })
-  return { subscribers: data || [], count: count || 0 }
+  const supabase = getSupabaseAdmin()
+  if (!supabase) {
+    return { subscribers: [], count: 0 }
+  }
+  
+  try {
+    const { data, error, count } = await supabase
+      .from('newsletter_subscribers')
+      .select('*', { count: 'exact' })
+      .order('created_at', { ascending: false })
+    
+    if (error) {
+      console.error('Error fetching subscribers:', error)
+      return { subscribers: [], count: 0 }
+    }
+    
+    return { subscribers: data || [], count: count || 0 }
+  } catch (error) {
+    console.error('Error fetching subscribers:', error)
+    return { subscribers: [], count: 0 }
+  }
 }
 
 export default async function NewsletterManagementPage() {

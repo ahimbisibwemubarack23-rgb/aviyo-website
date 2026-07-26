@@ -1,5 +1,5 @@
 export const dynamic = "force-dynamic";
-// app/(admin)/admin/contacts/page.tsx
+
 import { getSupabaseAdmin } from '@/lib/supabase/server'
 import { Metadata } from 'next'
 
@@ -8,11 +8,27 @@ export const metadata: Metadata = {
 }
 
 async function getContacts() {
-  const { data } = await getSupabaseAdmin()
-    .from('contact_submissions')
-    .select('*')
-    .order('created_at', { ascending: false })
-  return data || []
+  const supabase = getSupabaseAdmin()
+  if (!supabase) {
+    return []
+  }
+  
+  try {
+    const { data, error } = await supabase
+      .from('contact_submissions')
+      .select('*')
+      .order('created_at', { ascending: false })
+    
+    if (error) {
+      console.error('Error fetching contacts:', error)
+      return []
+    }
+    
+    return data || []
+  } catch (error) {
+    console.error('Error fetching contacts:', error)
+    return []
+  }
 }
 
 const getStatusColor = (status: string) => {

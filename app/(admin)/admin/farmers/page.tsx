@@ -1,5 +1,4 @@
 export const dynamic = "force-dynamic";
-// app/(admin)/admin/farmers/page.tsx
 
 import { getSupabaseAdmin } from '@/lib/supabase/server'
 import { Metadata } from 'next'
@@ -9,11 +8,27 @@ export const metadata: Metadata = {
 }
 
 async function getFarmers() {
-  const { data } = await getSupabaseAdmin()
-    .from('farmer_registrations')
-    .select('*')
-    .order('created_at', { ascending: false })
-  return data || []
+  const supabase = getSupabaseAdmin()
+  if (!supabase) {
+    return []
+  }
+  
+  try {
+    const { data, error } = await supabase
+      .from('farmer_registrations')
+      .select('*')
+      .order('created_at', { ascending: false })
+    
+    if (error) {
+      console.error('Error fetching farmers:', error)
+      return []
+    }
+    
+    return data || []
+  } catch (error) {
+    console.error('Error fetching farmers:', error)
+    return []
+  }
 }
 
 const getStatusColor = (status: string) => {
