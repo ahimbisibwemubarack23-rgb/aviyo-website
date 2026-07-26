@@ -4,10 +4,20 @@ import { getSupabaseAdmin } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { FaPlus, FaEdit, FaTrash, FaEye } from 'react-icons/fa'
 
-async function getBlogPosts() {
+interface BlogPost {
+  id: string
+  title: string
+  slug: string
+  excerpt: string | null
+  status: string
+  created_at: string
+  users?: {
+    full_name: string
+  }
+}
+
+async function getBlogPosts(): Promise<BlogPost[]> {
   const supabase = getSupabaseAdmin()
-  
-  // If no client, return empty array during build
   if (!supabase) {
     return []
   }
