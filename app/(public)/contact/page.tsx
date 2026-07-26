@@ -1,5 +1,4 @@
 'use client'
-// app/(public)/contact/page.tsx
 
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase/client'
@@ -51,7 +50,6 @@ export default function ContactPage() {
       <ToastContainer position="top-right" />
       
       <div className="container max-w-5xl">
-        {/* Header */}
         <div className="text-center mb-12">
           <h1 className="font-display text-4xl font-bold text-gray-900 mb-4">
             Get in Touch
@@ -62,7 +60,6 @@ export default function ContactPage() {
         </div>
 
         <div className="grid md:grid-cols-3 gap-8">
-          {/* Contact Info */}
           <div className="md:col-span-1 space-y-6">
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
               <div className="text-2xl mb-2">📍</div>
@@ -105,7 +102,6 @@ export default function ContactPage() {
             </div>
           </div>
 
-          {/* Contact Form */}
           <div className="md:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
             <h2 className="font-display text-2xl font-bold text-gray-900 mb-6">
               Send a Message

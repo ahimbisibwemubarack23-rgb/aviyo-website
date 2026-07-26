@@ -1,5 +1,4 @@
 'use client'
-// app/(public)/farmers/page.tsx
 
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase/client'
@@ -65,7 +64,6 @@ export default function FarmersPage() {
       <ToastContainer position="top-right" />
       
       <div className="container max-w-4xl">
-        {/* Header */}
         <div className="text-center mb-12">
           <h1 className="font-display text-4xl font-bold text-gray-900 mb-4">
             Partner with Us 🌾
@@ -75,7 +73,6 @@ export default function FarmersPage() {
           </p>
         </div>
 
-        {/* Benefits */}
         <div className="grid md:grid-cols-3 gap-6 mb-12">
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 text-center">
             <div className="text-3xl mb-3">💰</div>
@@ -94,7 +91,6 @@ export default function FarmersPage() {
           </div>
         </div>
 
-        {/* Form */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
           <h2 className="font-display text-2xl font-bold text-gray-900 mb-6">
             Farmer Registration
