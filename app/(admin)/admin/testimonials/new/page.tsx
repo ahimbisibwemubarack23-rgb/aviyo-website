@@ -1,13 +1,12 @@
 'use client'
-// app/(admin)/admin/testimonials/new/page.tsx
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase/client'
-import { FaSpinner, FaStar } from 'react-icons/fa'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { ToastContainer } from 'react-toastify'
+import { FaSpinner, FaStar } from 'react-icons/fa'
 import ImageUpload from '@/components/admin/ImageUpload'
 
 export default function NewTestimonialPage() {
@@ -34,6 +33,12 @@ export default function NewTestimonialPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
+
+    if (!supabase) {
+      toast.error('Database connection error. Please try again.')
+      setLoading(false)
+      return
+    }
 
     try {
       const payload = {
@@ -78,53 +83,45 @@ export default function NewTestimonialPage() {
 
       <form id="testimonial-form" onSubmit={handleSubmit} className="max-w-2xl space-y-6">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Customer Name *
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Customer Name *</label>
           <input
             type="text"
             name="name"
             value={formData.name}
             onChange={handleChange}
             required
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
             placeholder="Enter customer name"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Role / Title
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Role / Title</label>
           <input
             type="text"
             name="role"
             value={formData.role}
             onChange={handleChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
             placeholder="e.g. Customer, Nutritionist, Chef"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Testimonial *
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Testimonial *</label>
           <textarea
             name="quote"
             value={formData.quote}
             onChange={handleChange}
             rows={4}
             required
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
             placeholder="What did they say about Aviyo?"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Rating
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Rating</label>
           <div className="flex items-center gap-1">
             {[...Array(5)].map((_, i) => (
               <button
@@ -147,9 +144,7 @@ export default function NewTestimonialPage() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Customer Photo
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Customer Photo</label>
           <ImageUpload
             value={photo}
             onChange={setPhoto}
