@@ -1,21 +1,27 @@
+//cat > app/api/team/route.ts << 'EOF'
 export const runtime = "edge";
 
+import { supabaseAdmin } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 
 export async function GET() {
   try {
-    const supabase = supabaseAdmin
-    if (!supabase) {
+    if (!supabaseAdmin) {
       return NextResponse.json([], { status: 200 })
     }
-    
-    const { data, error } = await supabase
+
+    const { data, error } = await supabaseAdmin
       .from('team_members')
       .select('*')
       .eq('is_active', true)
       .order('display_order', { ascending: true })
 
-    if (error) throw error
+    if (error) {
+      return NextResponse.json(
+        { error: error.message },
+        { status: 500 }
+      )
+    }
 
     return NextResponse.json(data)
   } catch (error) {
@@ -29,7 +35,7 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    
+
     if (!body.name || !body.role) {
       return NextResponse.json(
         { error: 'Name and role are required' },
@@ -37,21 +43,25 @@ export async function POST(request: Request) {
       )
     }
 
-    const supabase = supabaseAdmin
-    if (!supabase) {
+    if (!supabaseAdmin) {
       return NextResponse.json(
         { error: 'Database not available' },
         { status: 503 }
       )
     }
 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('team_members')
       .insert(body)
       .select()
       .single()
 
-    if (error) throw error
+    if (error) {
+      return NextResponse.json(
+        { error: error.message },
+        { status: 500 }
+      )
+    }
 
     return NextResponse.json(data, { status: 201 })
   } catch (error) {
@@ -61,3 +71,4 @@ export async function POST(request: Request) {
     )
   }
 }
+//EOF
