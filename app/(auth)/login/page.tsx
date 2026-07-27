@@ -2,8 +2,9 @@
 
 import { useState } from 'react'
 
-const SUPABASE_URL = 'https://wfwbkwjujlvirxjytihw.supabase.co'
-const SUPABASE_ANON_KEY = 'sb_publishable_0Qel6JKxDnILOks0dyfaDg_22dTuFcf'
+// Use the URL and key from environment variables
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://wfwbkwjujlvirxjytihw.supabase.co'
+const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'sb_publishable_0Qel6JKxDnILOks0dyfaDg_22dTuFcf'
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false)
@@ -23,10 +24,7 @@ export default function LoginPage() {
           'Content-Type': 'application/json',
           'apikey': SUPABASE_ANON_KEY,
         },
-        body: JSON.stringify({
-          email,
-          password,
-        }),
+        body: JSON.stringify({ email, password }),
       })
 
       const data = await response.json()
@@ -38,13 +36,13 @@ export default function LoginPage() {
       }
 
       if (data.access_token) {
-        // Store tokens
         localStorage.setItem('supabase_access_token', data.access_token)
         localStorage.setItem('supabase_refresh_token', data.refresh_token)
+        localStorage.setItem('supabase_user', JSON.stringify(data.user))
         window.location.href = '/admin/dashboard'
       }
     } catch (err: any) {
-      setError(err.message || 'Connection error. Please try again.')
+      setError('Connection error: ' + err.message)
       setLoading(false)
     }
   }
@@ -63,30 +61,24 @@ export default function LoginPage() {
         <form onSubmit={handleSubmit} className="mt-8 space-y-6">
           <div className="space-y-4">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                Email address
-              </label>
+              <label className="block text-sm font-medium text-gray-700">Email address</label>
               <input
-                id="email"
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
                 placeholder="Enter your email"
               />
             </div>
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                Password
-              </label>
+              <label className="block text-sm font-medium text-gray-700">Password</label>
               <input
-                id="password"
                 type="password"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
                 placeholder="Enter your password"
               />
             </div>
@@ -100,7 +92,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-primary-500 text-white px-6 py-3 rounded-lg font-medium hover:bg-primary-600 transition-colors disabled:opacity-50"
+            className="w-full bg-primary-500 text-white px-6 py-3 rounded-lg font-medium hover:bg-primary-600 disabled:opacity-50"
           >
             {loading ? 'Signing in...' : 'Sign In'}
           </button>
