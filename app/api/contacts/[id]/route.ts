@@ -1,5 +1,7 @@
+
 export const runtime = "edge";
 
+import { supabaseAdmin } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 
 export async function GET(
@@ -7,21 +9,25 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const supabase = supabaseAdmin
-    if (!supabase) {
+    if (!supabaseAdmin) {
       return NextResponse.json(
         { error: 'Database not available' },
         { status: 503 }
       )
     }
-    
-    const { data, error } = await supabase
+
+    const { data, error } = await supabaseAdmin
       .from('contact_submissions')
       .select('*')
       .eq('id', params.id)
       .single()
 
-    if (error) throw error
+    if (error) {
+      return NextResponse.json(
+        { error: error.message },
+        { status: 500 }
+      )
+    }
 
     if (!data) {
       return NextResponse.json(
@@ -46,15 +52,14 @@ export async function PUT(
   try {
     const body = await request.json()
 
-    const supabase = supabaseAdmin
-    if (!supabase) {
+    if (!supabaseAdmin) {
       return NextResponse.json(
         { error: 'Database not available' },
         { status: 503 }
       )
     }
 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('contact_submissions')
       .update({
         status: body.status,
@@ -63,7 +68,12 @@ export async function PUT(
       .select()
       .single()
 
-    if (error) throw error
+    if (error) {
+      return NextResponse.json(
+        { error: error.message },
+        { status: 500 }
+      )
+    }
 
     return NextResponse.json(data)
   } catch (error) {
@@ -79,20 +89,24 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const supabase = supabaseAdmin
-    if (!supabase) {
+    if (!supabaseAdmin) {
       return NextResponse.json(
         { error: 'Database not available' },
         { status: 503 }
       )
     }
 
-    const { error } = await supabase
+    const { error } = await supabaseAdmin
       .from('contact_submissions')
       .delete()
       .eq('id', params.id)
 
-    if (error) throw error
+    if (error) {
+      return NextResponse.json(
+        { error: error.message },
+        { status: 500 }
+      )
+    }
 
     return NextResponse.json({ message: 'Contact deleted successfully' })
   } catch (error) {
