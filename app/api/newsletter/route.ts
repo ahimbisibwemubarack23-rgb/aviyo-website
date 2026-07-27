@@ -1,21 +1,27 @@
+//cat > app/api/newsletter/route.ts << 'EOF'
 export const runtime = "edge";
 
+import { supabaseAdmin } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 
 export async function GET() {
   try {
-    const supabase = supabaseAdmin
-    if (!supabase) {
+    if (!supabaseAdmin) {
       return NextResponse.json([], { status: 200 })
     }
-    
-    const { data, error } = await supabase
+
+    const { data, error } = await supabaseAdmin
       .from('newsletter_subscribers')
       .select('*')
       .eq('is_active', true)
       .order('created_at', { ascending: false })
 
-    if (error) throw error
+    if (error) {
+      return NextResponse.json(
+        { error: error.message },
+        { status: 500 }
+      )
+    }
 
     return NextResponse.json(data)
   } catch (error) {
@@ -29,7 +35,7 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const { email } = await request.json()
-    
+
     if (!email) {
       return NextResponse.json(
         { error: 'Email is required' },
@@ -37,15 +43,14 @@ export async function POST(request: Request) {
       )
     }
 
-    const supabase = supabaseAdmin
-    if (!supabase) {
+    if (!supabaseAdmin) {
       return NextResponse.json(
         { error: 'Database not available' },
         { status: 503 }
       )
     }
 
-    const { error } = await supabase
+    const { error } = await supabaseAdmin
       .from('newsletter_subscribers')
       .insert({ email })
 
@@ -56,7 +61,10 @@ export async function POST(request: Request) {
           { status: 409 }
         )
       }
-      throw error
+      return NextResponse.json(
+        { error: error.message },
+        { status: 500 }
+      )
     }
 
     return NextResponse.json(
@@ -74,7 +82,7 @@ export async function POST(request: Request) {
 export async function DELETE(request: Request) {
   try {
     const { email } = await request.json()
-    
+
     if (!email) {
       return NextResponse.json(
         { error: 'Email is required' },
@@ -82,20 +90,24 @@ export async function DELETE(request: Request) {
       )
     }
 
-    const supabase = supabaseAdmin
-    if (!supabase) {
+    if (!supabaseAdmin) {
       return NextResponse.json(
         { error: 'Database not available' },
         { status: 503 }
       )
     }
 
-    const { error } = await supabase
+    const { error } = await supabaseAdmin
       .from('newsletter_subscribers')
       .update({ is_active: false })
       .eq('email', email)
 
-    if (error) throw error
+    if (error) {
+      return NextResponse.json(
+        { error: error.message },
+        { status: 500 }
+      )
+    }
 
     return NextResponse.json(
       { message: 'Unsubscribed successfully' },
@@ -108,3 +120,4 @@ export async function DELETE(request: Request) {
     )
   }
 }
+//EOF

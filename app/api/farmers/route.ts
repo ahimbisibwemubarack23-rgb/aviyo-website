@@ -1,20 +1,26 @@
+//cat > app/api/farmers/route.ts << 'EOF'
 export const runtime = "edge";
 
+import { supabaseAdmin } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 
 export async function GET() {
   try {
-    const supabase = supabaseAdmin
-    if (!supabase) {
+    if (!supabaseAdmin) {
       return NextResponse.json([], { status: 200 })
     }
-    
-    const { data, error } = await supabase
+
+    const { data, error } = await supabaseAdmin
       .from('farmer_registrations')
       .select('*')
       .order('created_at', { ascending: false })
 
-    if (error) throw error
+    if (error) {
+      return NextResponse.json(
+        { error: error.message },
+        { status: 500 }
+      )
+    }
 
     return NextResponse.json(data)
   } catch (error) {
@@ -28,7 +34,7 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    
+
     if (!body.full_name || !body.phone) {
       return NextResponse.json(
         { error: 'Full name and phone are required' },
@@ -36,22 +42,26 @@ export async function POST(request: Request) {
       )
     }
 
-    const supabase = supabaseAdmin
-    if (!supabase) {
+    if (!supabaseAdmin) {
       return NextResponse.json(
         { error: 'Database not available' },
         { status: 503 }
       )
     }
 
-    const { error } = await supabase
+    const { error } = await supabaseAdmin
       .from('farmer_registrations')
       .insert({
         ...body,
         status: 'pending',
       })
 
-    if (error) throw error
+    if (error) {
+      return NextResponse.json(
+        { error: error.message },
+        { status: 500 }
+      )
+    }
 
     return NextResponse.json(
       { message: 'Registration successful' },
@@ -64,3 +74,4 @@ export async function POST(request: Request) {
     )
   }
 }
+//EOF

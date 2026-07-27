@@ -1,5 +1,7 @@
+//cat > app/api/upload/route.ts << 'EOF'
 export const runtime = "edge";
 
+import { supabaseAdmin } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 
 export async function POST(request: Request) {
@@ -30,10 +32,9 @@ export async function POST(request: Request) {
       )
     }
 
-    const supabase = supabaseAdmin
-    if (!supabase) {
+    if (!supabaseAdmin) {
       return NextResponse.json(
-        { error: 'Database not available' },
+        { error: 'Storage not available' },
         { status: 503 }
       )
     }
@@ -45,20 +46,25 @@ export async function POST(request: Request) {
     const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`
     const filePath = `${folder}/${fileName}`
 
-    const { error: uploadError } = await supabase.storage
+    const { error: uploadError } = await supabaseAdmin.storage
       .from('images')
       .upload(filePath, buffer, {
         contentType: file.type,
         upsert: false,
       })
 
-    if (uploadError) throw uploadError
+    if (uploadError) {
+      return NextResponse.json(
+        { error: uploadError.message },
+        { status: 500 }
+      )
+    }
 
-    const { data: { publicUrl } } = supabase.storage
+    const { data: { publicUrl } } = supabaseAdmin.storage
       .from('images')
       .getPublicUrl(filePath)
 
-    return NextResponse.json({ 
+    return NextResponse.json({
       url: publicUrl,
       path: filePath,
       message: 'File uploaded successfully'
@@ -75,7 +81,7 @@ export async function POST(request: Request) {
 export async function DELETE(request: Request) {
   try {
     const { path } = await request.json()
-    
+
     if (!path) {
       return NextResponse.json(
         { error: 'File path is required' },
@@ -83,19 +89,23 @@ export async function DELETE(request: Request) {
       )
     }
 
-    const supabase = supabaseAdmin
-    if (!supabase) {
+    if (!supabaseAdmin) {
       return NextResponse.json(
-        { error: 'Database not available' },
+        { error: 'Storage not available' },
         { status: 503 }
       )
     }
 
-    const { error } = await supabase.storage
+    const { error } = await supabaseAdmin.storage
       .from('images')
       .remove([path])
 
-    if (error) throw error
+    if (error) {
+      return NextResponse.json(
+        { error: error.message },
+        { status: 500 }
+      )
+    }
 
     return NextResponse.json({ message: 'File deleted successfully' })
   } catch (error) {
@@ -105,3 +115,4 @@ export async function DELETE(request: Request) {
     )
   }
 }
+//EOF
