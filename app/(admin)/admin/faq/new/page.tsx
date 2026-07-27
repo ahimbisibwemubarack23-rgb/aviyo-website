@@ -1,13 +1,12 @@
-// app/(admin)/admin/faq/new/page.tsx
 'use client'
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase/client'
-import { FaSpinner } from 'react-icons/fa'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { ToastContainer } from 'react-toastify'
+import { FaSpinner } from 'react-icons/fa'
 
 export default function NewFAQPage() {
   const router = useRouter()
@@ -31,6 +30,12 @@ export default function NewFAQPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
+
+    if (!supabase) {
+      toast.error('Database connection error. Please try again.')
+      setLoading(false)
+      return
+    }
 
     try {
       const { error } = await supabase.from('faqs').insert(formData)
@@ -69,60 +74,52 @@ export default function NewFAQPage() {
 
       <form id="faq-form" onSubmit={handleSubmit} className="max-w-2xl space-y-6">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Question *
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Question *</label>
           <input
             type="text"
             name="question"
             value={formData.question}
             onChange={handleChange}
             required
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
             placeholder="Enter the question"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Answer *
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Answer *</label>
           <textarea
             name="answer"
             value={formData.answer}
             onChange={handleChange}
             rows={4}
             required
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
             placeholder="Enter the answer"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Category
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
           <input
             type="text"
             name="category"
             value={formData.category}
             onChange={handleChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
             placeholder="e.g. Products, Nutrition, Shipping"
           />
         </div>
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Display Order
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Display Order</label>
             <input
               type="number"
               name="display_order"
               value={formData.display_order}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
               placeholder="0"
             />
           </div>
