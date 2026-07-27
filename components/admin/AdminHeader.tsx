@@ -1,7 +1,7 @@
-// components/admin/AdminHeader.tsx
+//cat > components/admin/AdminHeader.tsx << 'EOF'
 'use client'
 
-import { useState, useEffect } from 'react'  // ← Add useState and useEffect
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase/client'
 import { FaBars, FaTimes, FaUser, FaBell } from 'react-icons/fa'
@@ -17,6 +17,10 @@ export default function AdminHeader({ onMenuToggle, isMenuOpen = false }: AdminH
 
   useEffect(() => {
     const getUser = async () => {
+      if (!supabase) {
+        return
+      }
+
       const { data: { user } } = await supabase.auth.getUser()
       if (user) {
         setUser(user)
@@ -93,3 +97,4 @@ export default function AdminHeader({ onMenuToggle, isMenuOpen = false }: AdminH
     </header>
   )
 }
+//EOF
