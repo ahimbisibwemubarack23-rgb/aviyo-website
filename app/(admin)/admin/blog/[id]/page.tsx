@@ -6,7 +6,7 @@ import { supabase } from '@/lib/supabase/client'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { ToastContainer } from 'react-toastify'
-import { FaSpinner, FaTimes, FaPlus } from 'react-icons/fa'  // ← Removed FaUpload
+import { FaSpinner, FaTimes } from 'react-icons/fa'  // ← Removed FaUpload and FaPlus
 import ImageUpload from '@/components/admin/ImageUpload'
 
 export default function EditBlogPostPage() {
