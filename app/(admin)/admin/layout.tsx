@@ -1,5 +1,4 @@
 'use client'
-// app/(admin)/layout.tsx
 
 import { useState, useEffect } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
@@ -45,6 +44,11 @@ export default function AdminLayout({
 
   useEffect(() => {
     const checkAuth = async () => {
+      if (!supabase) {
+        router.push('/login')
+        return
+      }
+
       const { data: { session } } = await supabase.auth.getSession()
       if (!session) {
         router.push('/login')
@@ -62,7 +66,9 @@ export default function AdminLayout({
   }, [router])
 
   const handleLogout = async () => {
-    await supabase.auth.signOut()
+    if (supabase) {
+      await supabase.auth.signOut()
+    }
     router.push('/login')
   }
 
