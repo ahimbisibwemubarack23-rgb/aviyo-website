@@ -1,22 +1,16 @@
-// app/(admin)/admin/team/[id]/page.tsx
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useRouter, useParams } from 'next/navigation'
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase/client'
-import { FaSpinner, FaUpload, FaTimes } from 'react-icons/fa'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { ToastContainer } from 'react-toastify'
-//import ImageUpload from '@/components/admin/ImageUpload'
+import { FaSpinner, FaUpload, FaTimes } from 'react-icons/fa'
 
-export default function EditTeamMemberPage() {
+export default function NewTeamMemberPage() {
   const router = useRouter()
-  const params = useParams()
-  const id = params.id as string
-
-  const [loading, setLoading] = useState(true)
-  const [saving, setSaving] = useState(false)
+  const [loading, setLoading] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [photo, setPhoto] = useState('')
   const [formData, setFormData] = useState({
@@ -27,37 +21,6 @@ export default function EditTeamMemberPage() {
     is_active: true,
     social_links: { twitter: '', linkedin: '', instagram: '' },
   })
-
-  useEffect(() => {
-    const fetchMember = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('team_members')
-          .select('*')
-          .eq('id', id)
-          .single()
-
-        if (error) throw error
-
-        setFormData({
-          name: data.name || '',
-          role: data.role || '',
-          bio: data.bio || '',
-          display_order: data.display_order || 0,
-          is_active: data.is_active ?? true,
-          social_links: data.social_links || { twitter: '', linkedin: '', instagram: '' },
-        })
-        setPhoto(data.photo || '')
-      } catch (error) {
-        toast.error('Failed to load team member')
-        router.push('/admin/team')
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    if (id) fetchMember()
-  }, [id, router])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const value = e.target.type === 'checkbox' ? (e.target as HTMLInputElement).checked : e.target.value
@@ -80,6 +43,11 @@ export default function EditTeamMemberPage() {
   const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
+
+    if (!supabase) {
+      toast.error('Database connection error')
+      return
+    }
 
     setUploading(true)
     try {
@@ -112,39 +80,33 @@ export default function EditTeamMemberPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setSaving(true)
+    setLoading(true)
+
+    if (!supabase) {
+      toast.error('Database connection error')
+      setLoading(false)
+      return
+    }
 
     try {
       const payload = {
         ...formData,
         photo,
         social_links: formData.social_links,
-        updated_at: new Date().toISOString(),
       }
 
-      const { error } = await supabase
-        .from('team_members')
-        .update(payload)
-        .eq('id', id)
+      const { error } = await supabase.from('team_members').insert(payload)
 
       if (error) throw error
 
-      toast.success('Team member updated successfully!')
+      toast.success('Team member added successfully!')
       router.push('/admin/team')
       router.refresh()
     } catch (error: any) {
-      toast.error(error.message || 'Failed to update team member')
+      toast.error(error.message || 'Failed to add team member')
     } finally {
-      setSaving(false)
+      setLoading(false)
     }
-  }
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
-      </div>
-    )
   }
 
   return (
@@ -153,113 +115,96 @@ export default function EditTeamMemberPage() {
       
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Edit Team Member</h1>
-          <p className="text-gray-500">Update team member information</p>
+          <h1 className="text-2xl font-bold text-gray-900">Add Team Member</h1>
+          <p className="text-gray-500">Add a new team member</p>
         </div>
         <button
           type="submit"
           form="team-form"
-          disabled={saving}
+          disabled={loading}
           className="bg-primary-500 text-white px-6 py-2 rounded-lg font-medium hover:bg-primary-600 transition-colors disabled:opacity-50 flex items-center gap-2"
         >
-          {saving && <FaSpinner className="animate-spin" />}
-          {saving ? 'Saving...' : 'Update Member'}
+          {loading && <FaSpinner className="animate-spin" />}
+          {loading ? 'Saving...' : 'Save Member'}
         </button>
       </div>
 
       <form id="team-form" onSubmit={handleSubmit} className="space-y-6">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Full Name *
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Full Name *</label>
               <input
                 type="text"
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
                 placeholder="Enter full name"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Role *
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Role *</label>
               <input
                 type="text"
                 name="role"
                 value={formData.role}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
                 placeholder="e.g. Nutritionist, Production Manager"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Bio
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Bio</label>
               <textarea
                 name="bio"
                 value={formData.bio}
                 onChange={handleChange}
                 rows={4}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
                 placeholder="Brief biography of the team member"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Social Links
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Social Links</label>
               <div className="space-y-2">
                 <input
                   type="url"
                   placeholder="Twitter URL"
                   value={formData.social_links.twitter}
                   onChange={(e) => handleSocialChange('twitter', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
                 />
                 <input
                   type="url"
                   placeholder="LinkedIn URL"
                   value={formData.social_links.linkedin}
                   onChange={(e) => handleSocialChange('linkedin', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
                 />
                 <input
                   type="url"
                   placeholder="Instagram URL"
                   value={formData.social_links.instagram}
                   onChange={(e) => handleSocialChange('instagram', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
                 />
               </div>
             </div>
           </div>
 
-          {/* Sidebar */}
           <div className="space-y-6">
-            {/* Photo */}
             <div className="bg-white rounded-lg border border-gray-200 p-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Profile Photo
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Profile Photo</label>
               <div className="flex flex-col items-center">
                 {photo ? (
                   <div className="relative w-40 h-40 rounded-full overflow-hidden bg-gray-100">
-                    <img
-                      src={photo}
-                      alt="Profile"
-                      className="w-full h-full object-cover"
-                    />
+                    <img src={photo} alt="Profile" className="w-full h-full object-cover" />
                     <button
                       type="button"
                       onClick={removePhoto}
@@ -288,7 +233,6 @@ export default function EditTeamMemberPage() {
               </div>
             </div>
 
-            {/* Settings */}
             <div className="bg-white rounded-lg border border-gray-200 p-4 space-y-3">
               <div>
                 <label className="block text-sm text-gray-600">Display Order</label>
