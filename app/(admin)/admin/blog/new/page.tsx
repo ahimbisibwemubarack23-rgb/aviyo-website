@@ -1,13 +1,12 @@
-// app/(admin)/admin/blog/new/page.tsx
 'use client'
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase/client'
-import { FaSpinner } from 'react-icons/fa'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { ToastContainer } from 'react-toastify'
+import { FaSpinner } from 'react-icons/fa'
 
 export default function NewBlogPostPage() {
   const router = useRouter()
@@ -41,9 +40,19 @@ export default function NewBlogPostPage() {
     e.preventDefault()
     setLoading(true)
 
+    if (!supabase) {
+      toast.error('Database connection error. Please try again.')
+      setLoading(false)
+      return
+    }
+
     try {
       const payload = {
-        ...formData,
+        title: formData.title,
+        slug: formData.slug,
+        excerpt: formData.excerpt,
+        content: formData.content,
+        status: formData.status,
         categories: formData.categories ? formData.categories.split(',').map(c => c.trim()) : [],
         tags: formData.tags ? formData.tags.split(',').map(t => t.trim()) : [],
         published_at: formData.status === 'published' ? new Date().toISOString() : null,
@@ -85,12 +94,9 @@ export default function NewBlogPostPage() {
 
       <form id="blog-form" onSubmit={handleSubmit} className="space-y-6">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Title *
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Title *</label>
               <input
                 type="text"
                 name="title"
@@ -98,15 +104,13 @@ export default function NewBlogPostPage() {
                 onChange={handleChange}
                 onBlur={generateSlug}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
                 placeholder="Enter post title"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Slug *
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Slug *</label>
               <div className="flex gap-2">
                 <input
                   type="text"
@@ -114,13 +118,13 @@ export default function NewBlogPostPage() {
                   value={formData.slug}
                   onChange={handleChange}
                   required
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
                   placeholder="post-url-slug"
                 />
                 <button
                   type="button"
                   onClick={generateSlug}
-                  className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                  className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
                 >
                   Generate
                 </button>
@@ -128,46 +132,39 @@ export default function NewBlogPostPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Excerpt
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Excerpt</label>
               <textarea
                 name="excerpt"
                 value={formData.excerpt}
                 onChange={handleChange}
                 rows={2}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                placeholder="Brief summary of the post"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                placeholder="Brief summary"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Content *
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Content *</label>
               <textarea
                 name="content"
                 value={formData.content}
                 onChange={handleChange}
                 rows={15}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent font-mono"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 font-mono"
                 placeholder="Write your post content here..."
               />
             </div>
           </div>
 
-          {/* Sidebar */}
           <div className="space-y-6">
             <div className="bg-white rounded-lg border border-gray-200 p-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Status
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
               <select
                 name="status"
                 value={formData.status}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
               >
                 <option value="draft">Draft</option>
                 <option value="published">Published</option>
@@ -176,30 +173,26 @@ export default function NewBlogPostPage() {
             </div>
 
             <div className="bg-white rounded-lg border border-gray-200 p-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Categories
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Categories</label>
               <input
                 type="text"
                 name="categories"
                 value={formData.categories}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
                 placeholder="Nutrition, Health, Sustainability"
               />
               <p className="text-xs text-gray-500 mt-1">Comma separated</p>
             </div>
 
             <div className="bg-white rounded-lg border border-gray-200 p-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Tags
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Tags</label>
               <input
                 type="text"
                 name="tags"
                 value={formData.tags}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
                 placeholder="plant-based, lactose-free, uganda"
               />
               <p className="text-xs text-gray-500 mt-1">Comma separated</p>
