@@ -1,15 +1,15 @@
 export const runtime = "edge";
 
+import { supabaseAdmin } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 
 export async function GET() {
   try {
-    const supabase = supabaseAdmin
-    if (!supabase) {
+    if (!supabaseAdmin) {
       return NextResponse.json([], { status: 200 })
     }
     
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('contact_submissions')
       .select('*')
       .order('created_at', { ascending: false })
@@ -36,15 +36,14 @@ export async function POST(request: Request) {
       )
     }
 
-    const supabase = supabaseAdmin
-    if (!supabase) {
+    if (!supabaseAdmin) {
       return NextResponse.json(
         { error: 'Database not available' },
         { status: 503 }
       )
     }
 
-    const { error } = await supabase
+    const { error } = await supabaseAdmin
       .from('contact_submissions')
       .insert({
         ...body,
