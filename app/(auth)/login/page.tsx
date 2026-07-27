@@ -2,9 +2,7 @@
 
 import { useState } from 'react'
 
-// Use the URL and key from environment variables
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://wfwbkwjujlvirxjytihw.supabase.co'
-const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'sb_publishable_0Qel6JKxDnILOks0dyfaDg_22dTuFcf'
+const SUPABASE_ANON_KEY = 'sb_publishable_0Qel6JKxDnILOks0dyfaDg_22dTuFcf'
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false)
@@ -18,14 +16,19 @@ export default function LoginPage() {
     setError('')
 
     try {
-      const response = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': SUPABASE_ANON_KEY,
-        },
-        body: JSON.stringify({ email, password }),
-      })
+      // Use the Edge Function as a proxy
+      const response = await fetch(
+        'https://wfwbkwjujlvirxjytihw.supabase.co/functions/v1/cors-handler/auth/v1/token?grant_type=password',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+          },
+          body: JSON.stringify({ email, password }),
+        }
+      )
 
       const data = await response.json()
 
@@ -38,7 +41,6 @@ export default function LoginPage() {
       if (data.access_token) {
         localStorage.setItem('supabase_access_token', data.access_token)
         localStorage.setItem('supabase_refresh_token', data.refresh_token)
-        localStorage.setItem('supabase_user', JSON.stringify(data.user))
         window.location.href = '/admin/dashboard'
       }
     } catch (err: any) {
