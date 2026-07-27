@@ -6,7 +6,7 @@ import { supabase } from '@/lib/supabase/client'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { ToastContainer } from 'react-toastify'
-import { FaSpinner, FaUpload, FaTimes, FaPlus } from 'react-icons/fa'
+import { FaSpinner, FaTimes, FaPlus } from 'react-icons/fa'  // ← Removed FaUpload
 import ImageUpload from '@/components/admin/ImageUpload'
 
 export default function EditBlogPostPage() {
@@ -38,7 +38,7 @@ export default function EditBlogPostPage() {
       }
 
       try {
-        const { data, error } = await (supabase ? supabase : Promise.reject("No supabase"))
+        const { data, error } = await supabase
           .from('blog_posts')
           .select('*')
           .eq('id', id)
@@ -124,7 +124,7 @@ export default function EditBlogPostPage() {
         published_at: formData.status === 'published' ? new Date().toISOString() : null,
       }
 
-      const { error } = await (supabase ? supabase : Promise.reject("No supabase"))
+      const { error } = await supabase
         .from('blog_posts')
         .update(payload)
         .eq('id', id)
