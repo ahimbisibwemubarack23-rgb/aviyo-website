@@ -1,13 +1,12 @@
-// app/(admin)/admin/products/new/page.tsx
 'use client'
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase/client'
-import { FaSpinner, FaUpload, FaTimes, FaPlus } from 'react-icons/fa'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { ToastContainer } from 'react-toastify'
+import { FaSpinner, FaUpload, FaTimes, FaPlus } from 'react-icons/fa'
 
 export default function NewProductPage() {
   const router = useRouter()
@@ -16,7 +15,6 @@ export default function NewProductPage() {
   const [uploading, setUploading] = useState(false)
   const [features, setFeatures] = useState<string[]>([])
   const [newFeature, setNewFeature] = useState('')
-
   const [formData, setFormData] = useState({
     name: '',
     slug: '',
@@ -49,6 +47,11 @@ export default function NewProductPage() {
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
     if (!files) return
+
+    if (!supabase) {
+      toast.error('Database connection error')
+      return
+    }
 
     setUploading(true)
     try {
@@ -96,6 +99,12 @@ export default function NewProductPage() {
     e.preventDefault()
     setLoading(true)
 
+    if (!supabase) {
+      toast.error('Database connection error')
+      setLoading(false)
+      return
+    }
+
     try {
       const payload = {
         ...formData,
@@ -142,12 +151,9 @@ export default function NewProductPage() {
 
       <form id="product-form" onSubmit={handleSubmit} className="space-y-6">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Product Name *
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Product Name *</label>
               <input
                 type="text"
                 name="name"
@@ -155,15 +161,13 @@ export default function NewProductPage() {
                 onChange={handleChange}
                 onBlur={generateSlug}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
                 placeholder="Enter product name"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Slug *
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Slug *</label>
               <div className="flex gap-2">
                 <input
                   type="text"
@@ -171,13 +175,13 @@ export default function NewProductPage() {
                   value={formData.slug}
                   onChange={handleChange}
                   required
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
                   placeholder="product-url-slug"
                 />
                 <button
                   type="button"
                   onClick={generateSlug}
-                  className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                  className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
                 >
                   Generate
                 </button>
@@ -185,65 +189,50 @@ export default function NewProductPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Short Description
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Short Description</label>
               <input
                 type="text"
                 name="short_description"
                 value={formData.short_description}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
                 placeholder="Brief product summary"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Full Description *
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Full Description *</label>
               <textarea
                 name="description"
                 value={formData.description}
                 onChange={handleChange}
                 rows={5}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
                 placeholder="Detailed product description"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                How to Use
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">How to Use</label>
               <textarea
                 name="how_to_use"
                 value={formData.how_to_use}
                 onChange={handleChange}
                 rows={3}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
                 placeholder="Instructions for use"
               />
             </div>
           </div>
 
-          {/* Sidebar */}
           <div className="space-y-6">
-            {/* Images */}
             <div className="bg-white rounded-lg border border-gray-200 p-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Product Images
-              </label>
-              
+              <label className="block text-sm font-medium text-gray-700 mb-2">Product Images</label>
               <div className="grid grid-cols-3 gap-2 mb-3">
                 {images.map((image, index) => (
                   <div key={index} className="relative aspect-square rounded-lg overflow-hidden bg-gray-100">
-                    <img
-                      src={image}
-                      alt={`Product image ${index + 1}`}
-                      className="w-full h-full object-cover"
-                    />
+                    <img src={image} alt={`Product image ${index + 1}`} className="w-full h-full object-cover" />
                     <button
                       type="button"
                       onClick={() => removeImage(index)}
@@ -254,7 +243,6 @@ export default function NewProductPage() {
                   </div>
                 ))}
               </div>
-
               <label className="flex items-center justify-center w-full h-24 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-primary-500 transition-colors">
                 <div className="flex flex-col items-center">
                   <FaUpload className="w-6 h-6 text-gray-400 mb-1" />
@@ -273,11 +261,8 @@ export default function NewProductPage() {
               </label>
             </div>
 
-            {/* Features */}
             <div className="bg-white rounded-lg border border-gray-200 p-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Features
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Features</label>
               <div className="flex gap-2 mb-2">
                 <input
                   type="text"
@@ -297,16 +282,9 @@ export default function NewProductPage() {
               </div>
               <div className="flex flex-wrap gap-2">
                 {features.map((feature, index) => (
-                  <span
-                    key={index}
-                    className="flex items-center gap-1 px-2 py-1 bg-primary-50 text-primary-700 text-sm rounded-full"
-                  >
+                  <span key={index} className="flex items-center gap-1 px-2 py-1 bg-primary-50 text-primary-700 text-sm rounded-full">
                     {feature}
-                    <button
-                      type="button"
-                      onClick={() => removeFeature(index)}
-                      className="hover:text-red-500"
-                    >
+                    <button type="button" onClick={() => removeFeature(index)} className="hover:text-red-500">
                       <FaTimes className="w-3 h-3" />
                     </button>
                   </span>
@@ -314,7 +292,6 @@ export default function NewProductPage() {
               </div>
             </div>
 
-            {/* Details */}
             <div className="bg-white rounded-lg border border-gray-200 p-4 space-y-3">
               <div>
                 <label className="block text-sm text-gray-600">Price (UGX)</label>
