@@ -1,13 +1,12 @@
 'use client'
-export const runtime = "edge";
 
 import { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase/client'
-import { FaSpinner, FaUpload, FaTimes } from 'react-icons/fa'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { ToastContainer } from 'react-toastify'
+import { FaSpinner, FaUpload, FaTimes } from 'react-icons/fa'
 
 export default function EditTeamMemberPage() {
   const router = useRouter()
@@ -29,6 +28,12 @@ export default function EditTeamMemberPage() {
 
   useEffect(() => {
     const fetchMember = async () => {
+      if (!supabase) {
+        toast.error('Database connection error')
+        setLoading(false)
+        return
+      }
+
       try {
         const { data, error } = await supabase
           .from('team_members')
@@ -80,6 +85,11 @@ export default function EditTeamMemberPage() {
     const file = e.target.files?.[0]
     if (!file) return
 
+    if (!supabase) {
+      toast.error('Database connection error')
+      return
+    }
+
     setUploading(true)
     try {
       const fileExt = file.name.split('.').pop()
@@ -112,6 +122,12 @@ export default function EditTeamMemberPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setSaving(true)
+
+    if (!supabase) {
+      toast.error('Database connection error')
+      setSaving(false)
+      return
+    }
 
     try {
       const payload = {
@@ -168,97 +184,80 @@ export default function EditTeamMemberPage() {
 
       <form id="team-form" onSubmit={handleSubmit} className="space-y-6">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Full Name *
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Full Name *</label>
               <input
                 type="text"
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
                 placeholder="Enter full name"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Role *
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Role *</label>
               <input
                 type="text"
                 name="role"
                 value={formData.role}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
                 placeholder="e.g. Nutritionist, Production Manager"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Bio
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Bio</label>
               <textarea
                 name="bio"
                 value={formData.bio}
                 onChange={handleChange}
                 rows={4}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
                 placeholder="Brief biography of the team member"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Social Links
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Social Links</label>
               <div className="space-y-2">
                 <input
                   type="url"
                   placeholder="Twitter URL"
                   value={formData.social_links.twitter}
                   onChange={(e) => handleSocialChange('twitter', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
                 />
                 <input
                   type="url"
                   placeholder="LinkedIn URL"
                   value={formData.social_links.linkedin}
                   onChange={(e) => handleSocialChange('linkedin', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
                 />
                 <input
                   type="url"
                   placeholder="Instagram URL"
                   value={formData.social_links.instagram}
                   onChange={(e) => handleSocialChange('instagram', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
                 />
               </div>
             </div>
           </div>
 
-          {/* Sidebar */}
           <div className="space-y-6">
-            {/* Photo */}
             <div className="bg-white rounded-lg border border-gray-200 p-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Profile Photo
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Profile Photo</label>
               <div className="flex flex-col items-center">
                 {photo ? (
                   <div className="relative w-40 h-40 rounded-full overflow-hidden bg-gray-100">
-                    <img
-                      src={photo}
-                      alt="Profile"
-                      className="w-full h-full object-cover"
-                    />
+                    <img src={photo} alt="Profile" className="w-full h-full object-cover" />
                     <button
                       type="button"
                       onClick={removePhoto}
@@ -287,7 +286,6 @@ export default function EditTeamMemberPage() {
               </div>
             </div>
 
-            {/* Settings */}
             <div className="bg-white rounded-lg border border-gray-200 p-4 space-y-3">
               <div>
                 <label className="block text-sm text-gray-600">Display Order</label>
@@ -318,5 +316,3 @@ export default function EditTeamMemberPage() {
     </div>
   )
 }
-
-// app/(admin)/admin/team/[id]/page.tsx
