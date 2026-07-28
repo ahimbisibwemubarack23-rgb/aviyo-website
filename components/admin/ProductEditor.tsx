@@ -1,4 +1,3 @@
-// components/admin/ProductEditor.tsx
 'use client'
 
 import { useState } from 'react'
@@ -69,6 +68,11 @@ export default function ProductEditor({ initialData, isEditing = false }: Produc
   }
 
   const onSubmit = async (data: any) => {
+    if (!supabase) {
+      toast.error('Database connection error. Please try again.')
+      return
+    }
+
     setLoading(true)
     try {
       const payload = {
@@ -109,193 +113,94 @@ export default function ProductEditor({ initialData, isEditing = false }: Produc
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Main Content */}
         <div className="lg:col-span-2 space-y-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Product Name *
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Product Name *</label>
             <input
               {...register('name', { required: 'Name is required' })}
               onBlur={generateSlug}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
               placeholder="Enter product name"
             />
-            {errors.name && (
-              <p className="text-red-500 text-sm mt-1">
-                {String(errors.name.message)}
-              </p>
-            )}
+            {errors.name && <p className="text-red-500 text-sm mt-1">{String(errors.name.message)}</p>}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Slug *
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Slug *</label>
             <div className="flex gap-2">
               <input
                 {...register('slug', { required: 'Slug is required' })}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
                 placeholder="product-url-slug"
               />
-              <button
-                type="button"
-                onClick={generateSlug}
-                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-              >
-                Generate
-              </button>
+              <button type="button" onClick={generateSlug} className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">Generate</button>
             </div>
-            {errors.slug && (
-              <p className="text-red-500 text-sm mt-1">
-                {String(errors.slug.message)}
-              </p>
-            )}
+            {errors.slug && <p className="text-red-500 text-sm mt-1">{String(errors.slug.message)}</p>}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Short Description
-            </label>
-            <input
-              {...register('short_description')}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              placeholder="Brief product summary"
-            />
+            <label className="block text-sm font-medium text-gray-700 mb-1">Short Description</label>
+            <input {...register('short_description')} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500" placeholder="Brief product summary" />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Full Description *
-            </label>
-            <textarea
-              {...register('description', { required: 'Description is required' })}
-              rows={5}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              placeholder="Detailed product description"
-            />
-            {errors.description && (
-              <p className="text-red-500 text-sm mt-1">
-                {String(errors.description.message)}
-              </p>
-            )}
+            <label className="block text-sm font-medium text-gray-700 mb-1">Full Description *</label>
+            <textarea {...register('description', { required: 'Description is required' })} rows={5} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500" placeholder="Detailed product description" />
+            {errors.description && <p className="text-red-500 text-sm mt-1">{String(errors.description.message)}</p>}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              How to Use
-            </label>
-            <textarea
-              {...register('how_to_use')}
-              rows={3}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              placeholder="Instructions for use"
-            />
+            <label className="block text-sm font-medium text-gray-700 mb-1">How to Use</label>
+            <textarea {...register('how_to_use')} rows={3} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500" placeholder="Instructions for use" />
           </div>
         </div>
 
-        {/* Sidebar */}
         <div className="space-y-6">
-          {/* Images */}
           <div className="bg-white rounded-lg border border-gray-200 p-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Product Images
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Product Images</label>
             <div className="grid grid-cols-3 gap-2 mb-3">
               {images.map((image, index) => (
                 <div key={index} className="relative aspect-square rounded-lg overflow-hidden bg-gray-100">
-                  <img
-                    src={image}
-                    alt={`Product image ${index + 1}`}
-                    className="w-full h-full object-cover"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => removeImage(index)}
-                    className="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full hover:bg-red-600"
-                  >
+                  <img src={image} alt={`Product image ${index + 1}`} className="w-full h-full object-cover" />
+                  <button type="button" onClick={() => removeImage(index)} className="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full hover:bg-red-600">
                     <FaTimes className="w-3 h-3" />
                   </button>
                 </div>
               ))}
             </div>
-            <ImageUpload
-              value={null}
-              onChange={handleImageUpload}
-              folder="products"
-              label="Upload product images"
-              multiple
-            />
+            <ImageUpload value={null} onChange={handleImageUpload} folder="products" label="Upload product images" multiple />
           </div>
 
-          {/* Features */}
           <div className="bg-white rounded-lg border border-gray-200 p-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Features
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Features</label>
             <div className="flex gap-2 mb-2">
-              <input
-                type="text"
-                value={newFeature}
-                onChange={(e) => setNewFeature(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addFeature())}
-                className="flex-1 px-3 py-1 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500"
-                placeholder="Add a feature"
-              />
-              <button
-                type="button"
-                onClick={addFeature}
-                className="px-3 py-1 bg-primary-500 text-white rounded-lg hover:bg-primary-600"
-              >
-                <FaPlus />
-              </button>
+              <input type="text" value={newFeature} onChange={(e) => setNewFeature(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addFeature())} className="flex-1 px-3 py-1 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500" placeholder="Add a feature" />
+              <button type="button" onClick={addFeature} className="px-3 py-1 bg-primary-500 text-white rounded-lg hover:bg-primary-600"><FaPlus /></button>
             </div>
             <div className="flex flex-wrap gap-2">
               {features.map((feature) => (
-                <span
-                  key={feature}
-                  className="flex items-center gap-1 px-2 py-1 bg-primary-50 text-primary-700 text-sm rounded-full"
-                >
+                <span key={feature} className="flex items-center gap-1 px-2 py-1 bg-primary-50 text-primary-700 text-sm rounded-full">
                   {feature}
-                  <button
-                    type="button"
-                    onClick={() => removeFeature(feature)}
-                    className="hover:text-red-500"
-                  >
-                    <FaTimes className="w-3 h-3" />
-                  </button>
+                  <button type="button" onClick={() => removeFeature(feature)} className="hover:text-red-500"><FaTimes className="w-3 h-3" /></button>
                 </span>
               ))}
             </div>
           </div>
 
-          {/* Details */}
           <div className="bg-white rounded-lg border border-gray-200 p-4 space-y-3">
             <div>
               <label className="block text-sm text-gray-600">Price (UGX)</label>
-              <input
-                {...register('price')}
-                type="number"
-                className="w-full px-3 py-1 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500"
-                placeholder="0"
-              />
+              <input {...register('price')} type="number" className="w-full px-3 py-1 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500" placeholder="0" />
             </div>
 
             <div>
               <label className="block text-sm text-gray-600">Category</label>
-              <input
-                {...register('category')}
-                className="w-full px-3 py-1 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500"
-                placeholder="e.g. Plant-Based Milks"
-              />
+              <input {...register('category')} className="w-full px-3 py-1 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500" placeholder="e.g. Plant-Based Milks" />
             </div>
 
             <div>
               <label className="block text-sm text-gray-600">Status</label>
-              <select
-                {...register('status')}
-                className="w-full px-3 py-1 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500"
-              >
+              <select {...register('status')} className="w-full px-3 py-1 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
                 <option value="draft">Draft</option>
                 <option value="published">Published</option>
                 <option value="archived">Archived</option>
@@ -304,54 +209,17 @@ export default function ProductEditor({ initialData, isEditing = false }: Produc
 
             <div className="flex gap-4">
               <label className="flex items-center gap-2 text-sm text-gray-600">
-                <input
-                  {...register('in_stock')}
-                  type="checkbox"
-                  className="w-4 h-4 text-primary-500 focus:ring-primary-500"
-                />
+                <input {...register('in_stock')} type="checkbox" className="w-4 h-4 text-primary-500 focus:ring-primary-500" />
                 In Stock
               </label>
               <label className="flex items-center gap-2 text-sm text-gray-600">
-                <input
-                  {...register('is_featured')}
-                  type="checkbox"
-                  className="w-4 h-4 text-primary-500 focus:ring-primary-500"
-                />
+                <input {...register('is_featured')} type="checkbox" className="w-4 h-4 text-primary-500 focus:ring-primary-500" />
                 Featured
               </label>
             </div>
           </div>
 
-          {/* SEO */}
-          <div className="bg-white rounded-lg border border-gray-200 p-4">
-            <h3 className="font-medium text-gray-900 mb-2">SEO Settings</h3>
-            <div className="space-y-3">
-              <div>
-                <label className="block text-sm text-gray-600">SEO Title</label>
-                <input
-                  {...register('seo_title')}
-                  className="w-full px-3 py-1 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500"
-                  placeholder="SEO title"
-                />
-              </div>
-              <div>
-                <label className="block text-sm text-gray-600">SEO Description</label>
-                <textarea
-                  {...register('seo_description')}
-                  rows={2}
-                  className="w-full px-3 py-1 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500"
-                  placeholder="SEO description"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Submit */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-primary-500 text-white px-6 py-3 rounded-lg font-medium hover:bg-primary-600 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
-          >
+          <button type="submit" disabled={loading} className="w-full bg-primary-500 text-white px-6 py-3 rounded-lg font-medium hover:bg-primary-600 disabled:opacity-50 flex items-center justify-center gap-2">
             {loading && <FaSpinner className="animate-spin" />}
             {isEditing ? 'Update Product' : 'Create Product'}
           </button>
