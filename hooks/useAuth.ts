@@ -73,36 +73,38 @@ export function useAuth() {
     getSession()
 
     // Listen for auth changes
-    if (supabase) {
-      const { data: { subscription } } = supabase.auth.onAuthStateChange(
-        async (event: string, session: any) => {
-          if (event === 'SIGNED_IN' && session) {
-            const { data: userData } = await supabase
-              .from('users')
-              .select('*')
-              .eq('id', session.user.id)
-              .single()
+    if (!supabase) {
+      return
+    }
 
-            setState({
-              user: userData as User,
-              session,
-              isLoading: false,
-              isAuthenticated: true,
-            })
-          } else if (event === 'SIGNED_OUT') {
-            setState({
-              user: null,
-              session: null,
-              isLoading: false,
-              isAuthenticated: false,
-            })
-          }
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event: string, session: any) => {
+        if (event === 'SIGNED_IN' && session) {
+          const { data: userData } = await supabase
+            .from('users')
+            .select('*')
+            .eq('id', session.user.id)
+            .single()
+
+          setState({
+            user: userData as User,
+            session,
+            isLoading: false,
+            isAuthenticated: true,
+          })
+        } else if (event === 'SIGNED_OUT') {
+          setState({
+            user: null,
+            session: null,
+            isLoading: false,
+            isAuthenticated: false,
+          })
         }
-      )
-
-      return () => {
-        subscription.unsubscribe()
       }
+    )
+
+    return () => {
+      subscription.unsubscribe()
     }
   }, [])
 
