@@ -1,4 +1,3 @@
-// components/admin/FAQEditor.tsx
 'use client'
 
 import { useState } from 'react'
@@ -28,6 +27,11 @@ export default function FAQEditor({ initialData, isEditing = false }: FAQEditorP
   })
 
   const onSubmit = async (data: any) => {
+    if (!supabase) {
+      toast.error('Database connection error. Please try again.')
+      return
+    }
+
     setLoading(true)
     try {
       const payload = {
@@ -67,58 +71,42 @@ export default function FAQEditor({ initialData, isEditing = false }: FAQEditorP
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="max-w-2xl space-y-6">
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Question *
-        </label>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Question *</label>
         <input
           {...register('question', { required: 'Question is required' })}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
           placeholder="Enter the question"
         />
-        {errors.question && (
-          <p className="text-red-500 text-sm mt-1">
-            {String(errors.question.message)}
-          </p>
-        )}
+        {errors.question && <p className="text-red-500 text-sm mt-1">{String(errors.question.message)}</p>}
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Answer *
-        </label>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Answer *</label>
         <textarea
           {...register('answer', { required: 'Answer is required' })}
           rows={4}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
           placeholder="Enter the answer"
         />
-        {errors.answer && (
-          <p className="text-red-500 text-sm mt-1">
-            {String(errors.answer.message)}
-          </p>
-        )}
+        {errors.answer && <p className="text-red-500 text-sm mt-1">{String(errors.answer.message)}</p>}
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Category
-        </label>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
         <input
           {...register('category')}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
           placeholder="e.g. Products, Nutrition, Shipping"
         />
       </div>
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Display Order
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Display Order</label>
           <input
             {...register('display_order')}
             type="number"
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
             placeholder="0"
           />
         </div>
