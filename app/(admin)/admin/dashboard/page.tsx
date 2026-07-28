@@ -1,6 +1,6 @@
 //cat > app/\(admin\)/admin/dashboard/page.tsx << 'EOF'
 'use client'
-
+echo "export const runtime = 'edge';"
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
@@ -42,7 +42,6 @@ export default function DashboardPage() {
         return
       }
 
-      // Fetch stats
       try {
         const [
           { count: blogCount },
