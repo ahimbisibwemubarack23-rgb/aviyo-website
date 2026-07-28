@@ -1,3 +1,4 @@
+//cat > app/\(admin\)/admin/layout.tsx << 'EOF'
 'use client'
 
 import { useState, useEffect } from 'react'
@@ -52,16 +53,19 @@ export default function AdminLayout({
       const { data: { session } } = await supabase.auth.getSession()
       if (!session) {
         router.push('/login')
-      } else {
-        const { data: userData } = await supabase
-          .from('users')
-          .select('*')
-          .eq('id', session.user.id)
-          .single()
-        setUser(userData)
+        return
       }
+
+      const { data: userData } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', session.user.id)
+        .single()
+      
+      setUser(userData)
       setLoading(false)
     }
+
     checkAuth()
   }, [router])
 
@@ -157,3 +161,4 @@ export default function AdminLayout({
     </div>
   )
 }
+//EOF
