@@ -1,81 +1,43 @@
 //cat > app/\(admin\)/admin/layout.tsx << 'EOF'
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
-import Link from 'next/link'
 import { supabase } from '@/lib/supabase/client'
-import {
-  FaHome,
-  FaFileAlt,
-  FaBox,
-  FaUsers,
-  FaQuestionCircle,
-  FaStar,
-  FaEnvelope,
-  FaNewspaper,
-  FaTractor,
-  FaSignOutAlt,
-  FaBars,
-  FaTimes,
-} from 'react-icons/fa'
+import Link from 'next/link'
 
 const navigation = [
-  { name: 'Dashboard', href: '/admin/dashboard', icon: FaHome },
-  { name: 'Blog Posts', href: '/admin/blog', icon: FaFileAlt },
-  { name: 'Products', href: '/admin/products', icon: FaBox },
-  { name: 'Team Members', href: '/admin/team', icon: FaUsers },
-  { name: 'FAQs', href: '/admin/faq', icon: FaQuestionCircle },
-  { name: 'Testimonials', href: '/admin/testimonials', icon: FaStar },
-  { name: 'Contacts', href: '/admin/contacts', icon: FaEnvelope },
-  { name: 'Newsletter', href: '/admin/newsletter', icon: FaNewspaper },
-  { name: 'Farmers', href: '/admin/farmers', icon: FaTractor },
+  { name: 'Dashboard', href: '/admin/dashboard' },
+  { name: 'Blog Posts', href: '/admin/blog' },
+  { name: 'Products', href: '/admin/products' },
+  { name: 'Team Members', href: '/admin/team' },
+  { name: 'FAQs', href: '/admin/faq' },
+  { name: 'Testimonials', href: '/admin/testimonials' },
+  { name: 'Contacts', href: '/admin/contacts' },
+  { name: 'Newsletter', href: '/admin/newsletter' },
+  { name: 'Farmers', href: '/admin/farmers' },
 ]
 
-export default function AdminLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter()
   const pathname = usePathname()
   const [loading, setLoading] = useState(true)
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
-  const [user, setUser] = useState<any>(null)
 
   useEffect(() => {
-    const checkAuth = async () => {
-      if (!supabase) {
-        router.push('/login')
-        return
-      }
-
+    const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession()
       if (!session) {
+        // Redirect to login if no session
         router.push('/login')
         return
       }
-
-      const { data: userData } = await supabase
-        .from('users')
-        .select('*')
-        .eq('id', session.user.id)
-        .single()
-      
-      setUser(userData)
+      // If session exists, show the content
       setLoading(false)
     }
-
-    checkAuth()
+    checkSession()
   }, [router])
 
-  const handleLogout = async () => {
-    if (supabase) {
-      await supabase.auth.signOut()
-    }
-    router.push('/login')
-  }
-
+  // Show loading indicator while checking session
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -86,78 +48,34 @@ export default function AdminLayout({
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 h-16">
-        <div className="flex items-center justify-between px-4 h-full">
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-              className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
-            >
-              {isSidebarOpen ? <FaTimes /> : <FaBars />}
-            </button>
-            <Link href="/admin/dashboard" className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center">
-                <span className="text-white font-bold text-sm">A</span>
-              </div>
-              <span className="font-semibold text-gray-900 hidden sm:block">Aviyo Admin</span>
-            </Link>
-          </div>
-
-          <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-600 hidden sm:block">
-              {user?.full_name || user?.email || 'Admin'}
-            </span>
-            <button
-              onClick={handleLogout}
-              className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-            >
-              <FaSignOutAlt className="w-5 h-5" />
-            </button>
-          </div>
-        </div>
-      </header>
-
-      {/* Sidebar */}
-      <aside className={`fixed left-0 top-16 h-full w-64 bg-white border-r border-gray-200 overflow-y-auto transition-transform duration-300 ${
-        isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-      } lg:translate-x-0 z-40`}>
-        <nav className="p-4 space-y-1">
-          {navigation.map((item) => {
-            const isActive = pathname === item.href || pathname?.startsWith(item.href + '/')
-            return (
+      <nav className="bg-white shadow-md p-4">
+        <div className="container mx-auto flex justify-between items-center">
+          <h1 className="text-xl font-bold text-primary-600">Aviyo Admin</h1>
+          <div className="flex space-x-4">
+            {navigation.map((item) => (
               <Link
-                key={item.name}
+                key={item.href}
                 href={item.href}
-                onClick={() => setIsSidebarOpen(false)}
-                className={`flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                  isActive
-                    ? 'bg-primary-50 text-primary-600'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                className={`text-sm font-medium transition-colors hover:text-primary-500 ${
+                  pathname === item.href ? 'text-primary-500' : 'text-gray-600'
                 }`}
               >
-                <item.icon className="w-5 h-5" />
                 {item.name}
               </Link>
-            )
-          })}
-        </nav>
-      </aside>
-
-      {/* Main Content */}
-      <main className="lg:ml-64 pt-16">
-        <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
-          {children}
+            ))}
+            <button
+              onClick={async () => {
+                await supabase.auth.signOut()
+                router.push('/login')
+              }}
+              className="text-sm text-red-500 hover:text-red-600"
+            >
+              Logout
+            </button>
+          </div>
         </div>
-      </main>
-
-      {/* Mobile Overlay */}
-      {isSidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black/20 z-30 lg:hidden"
-          onClick={() => setIsSidebarOpen(false)}
-        />
-      )}
+      </nav>
+      <main className="container mx-auto p-4">{children}</main>
     </div>
   )
 }
