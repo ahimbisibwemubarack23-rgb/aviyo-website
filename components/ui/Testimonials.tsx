@@ -1,4 +1,4 @@
-// components/ui/Testimonials.tsx
+//cat > components/ui/Testimonials.tsx << 'EOF'
 'use client'
 
 import { useState, useEffect } from 'react'
@@ -20,6 +20,11 @@ export default function Testimonials() {
 
   useEffect(() => {
     const fetchTestimonials = async () => {
+      if (!supabase) {
+        setLoading(false)
+        return
+      }
+
       try {
         const { data, error } = await supabase
           .from('testimonials')
@@ -109,3 +114,4 @@ export default function Testimonials() {
     </section>
   )
 }
+//EOF
