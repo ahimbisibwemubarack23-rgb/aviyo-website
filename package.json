@@ -10,6 +10,7 @@
     "lint": "next lint",
     "type-check": "tsc --noEmit",
     "pages:build": "npx @cloudflare/next-on-pages",
+    "pages:deploy": "npx wrangler pages deploy .vercel/output/static --project-name aviyo-plant-based",
     "cf:build": "npm run build && npm run pages:build",
     "deploy": "npx wrangler pages deploy .vercel/output/static --project-name aviyo-plant-based"
   },
