@@ -1,4 +1,4 @@
-// components/admin/TestimonialEditor.tsx
+//cat > components/admin/TestimonialEditor.tsx << 'EOF'
 'use client'
 
 import { useState } from 'react'
@@ -36,6 +36,11 @@ export default function TestimonialEditor({ initialData, isEditing = false }: Te
   }
 
   const onSubmit = async (data: any) => {
+    if (!supabase) {
+      toast.error('Database connection error. Please try again.')
+      return
+    }
+
     setLoading(true)
     try {
       const payload = {
@@ -76,53 +81,33 @@ export default function TestimonialEditor({ initialData, isEditing = false }: Te
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="max-w-2xl space-y-6">
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Customer Name *
-        </label>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Customer Name *</label>
         <input
           {...register('name', { required: 'Name is required' })}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
           placeholder="Enter customer name"
         />
-        {errors.name && (
-          <p className="text-red-500 text-sm mt-1">
-            {String(errors.name.message)}
-          </p>
-        )}
+        {errors.name && <p className="text-red-500 text-sm mt-1">{String(errors.name.message)}</p>}
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Role / Title
-        </label>
-        <input
-          {...register('role')}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-          placeholder="e.g. Customer, Nutritionist, Chef"
-        />
+        <label className="block text-sm font-medium text-gray-700 mb-1">Role / Title</label>
+        <input {...register('role')} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500" placeholder="e.g. Customer, Nutritionist, Chef" />
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Testimonial *
-        </label>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Testimonial *</label>
         <textarea
           {...register('quote', { required: 'Testimonial is required' })}
           rows={4}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
           placeholder="What did they say about Aviyo?"
         />
-        {errors.quote && (
-          <p className="text-red-500 text-sm mt-1">
-            {String(errors.quote.message)}
-          </p>
-        )}
+        {errors.quote && <p className="text-red-500 text-sm mt-1">{String(errors.quote.message)}</p>}
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Rating
-        </label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Rating</label>
         <div className="flex items-center gap-1">
           {[...Array(5)].map((_, i) => (
             <button
@@ -145,35 +130,20 @@ export default function TestimonialEditor({ initialData, isEditing = false }: Te
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Customer Photo
-        </label>
-        <ImageUpload
-          value={photo}
-          onChange={setPhoto}
-          folder="testimonials"
-          label="Upload customer photo"
-          circular
-        />
+        <label className="block text-sm font-medium text-gray-700 mb-2">Customer Photo</label>
+        <ImageUpload value={photo} onChange={setPhoto} folder="testimonials" label="Upload customer photo" circular />
       </div>
 
       <div className="flex items-center gap-2">
-        <input
-          {...register('is_active')}
-          type="checkbox"
-          className="w-4 h-4 text-primary-500 focus:ring-primary-500"
-        />
+        <input {...register('is_active')} type="checkbox" className="w-4 h-4 text-primary-500 focus:ring-primary-500" />
         <label className="text-sm text-gray-600">Active</label>
       </div>
 
-      <button
-        type="submit"
-        disabled={loading}
-        className="w-full bg-primary-500 text-white px-6 py-3 rounded-lg font-medium hover:bg-primary-600 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
-      >
+      <button type="submit" disabled={loading} className="w-full bg-primary-500 text-white px-6 py-3 rounded-lg font-medium hover:bg-primary-600 disabled:opacity-50 flex items-center justify-center gap-2">
         {loading && <FaSpinner className="animate-spin" />}
         {isEditing ? 'Update Testimonial' : 'Add Testimonial'}
       </button>
     </form>
   )
 }
+//EOF
