@@ -1,4 +1,3 @@
-// components/admin/Sidebar.tsx
 'use client'
 
 import Link from 'next/link'
@@ -41,6 +40,11 @@ export default function Sidebar({ isOpen = true, onClose }: SidebarProps) {
   const router = useRouter()
 
   const handleLogout = async () => {
+    if (!supabase) {
+      toast.error('Authentication not available')
+      return
+    }
+
     const { error } = await supabase.auth.signOut()
     if (error) {
       toast.error('Failed to logout')
