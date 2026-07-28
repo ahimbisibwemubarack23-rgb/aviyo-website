@@ -1,4 +1,4 @@
-// components/admin/BlogEditor.tsx
+//cat > components/admin/BlogEditor.tsx << 'EOF'
 'use client'
 
 import { useState } from 'react'
@@ -70,6 +70,11 @@ export default function BlogEditor({ initialData, isEditing = false }: BlogEdito
   }
 
   const onSubmit = async (data: any) => {
+    if (!supabase) {
+      toast.error('Database connection error. Please try again.')
+      return
+    }
+
     setLoading(true)
     try {
       const payload = {
@@ -129,7 +134,7 @@ export default function BlogEditor({ initialData, isEditing = false }: BlogEdito
                 className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
                 placeholder="post-url-slug"
               />
-              <button type="button" onClick={generateSlug} className="px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200">Generate</button>
+              <button type="button" onClick={generateSlug} className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">Generate</button>
             </div>
             {errors.slug && <p className="text-red-500 text-sm mt-1">{String(errors.slug.message)}</p>}
           </div>
@@ -202,3 +207,4 @@ export default function BlogEditor({ initialData, isEditing = false }: BlogEdito
     </form>
   )
 }
+//EOF
