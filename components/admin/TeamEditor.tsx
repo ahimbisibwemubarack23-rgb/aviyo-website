@@ -1,4 +1,3 @@
-// components/admin/TeamEditor.tsx
 'use client'
 
 import { useState } from 'react'
@@ -33,6 +32,11 @@ export default function TeamEditor({ initialData, isEditing = false }: TeamEdito
   })
 
   const onSubmit = async (data: any) => {
+    if (!supabase) {
+      toast.error('Database connection error. Please try again.')
+      return
+    }
+
     setLoading(true)
     try {
       const payload = {
@@ -78,120 +82,66 @@ export default function TeamEditor({ initialData, isEditing = false }: TeamEdito
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Main Content */}
         <div className="lg:col-span-2 space-y-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Full Name *
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Full Name *</label>
             <input
               {...register('name', { required: 'Name is required' })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
               placeholder="Enter full name"
             />
-            {errors.name && (
-              <p className="text-red-500 text-sm mt-1">
-                {String(errors.name.message)}
-              </p>
-            )}
+            {errors.name && <p className="text-red-500 text-sm mt-1">{String(errors.name.message)}</p>}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Role *
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Role *</label>
             <input
               {...register('role', { required: 'Role is required' })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
               placeholder="e.g. Nutritionist, Production Manager"
             />
-            {errors.role && (
-              <p className="text-red-500 text-sm mt-1">
-                {String(errors.role.message)}
-              </p>
-            )}
+            {errors.role && <p className="text-red-500 text-sm mt-1">{String(errors.role.message)}</p>}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Bio
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Bio</label>
             <textarea
               {...register('bio')}
               rows={4}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
               placeholder="Brief biography of the team member"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Social Links
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Social Links</label>
             <div className="space-y-2">
-              <input
-                {...register('twitter')}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                placeholder="Twitter URL"
-              />
-              <input
-                {...register('linkedin')}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                placeholder="LinkedIn URL"
-              />
-              <input
-                {...register('instagram')}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                placeholder="Instagram URL"
-              />
+              <input {...register('twitter')} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500" placeholder="Twitter URL" />
+              <input {...register('linkedin')} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500" placeholder="LinkedIn URL" />
+              <input {...register('instagram')} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500" placeholder="Instagram URL" />
             </div>
           </div>
         </div>
 
-        {/* Sidebar */}
         <div className="space-y-6">
-          {/* Photo */}
           <div className="bg-white rounded-lg border border-gray-200 p-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Profile Photo
-            </label>
-            <ImageUpload
-              value={photo}
-              onChange={setPhoto}
-              folder="team"
-              label="Upload profile photo"
-              circular
-            />
+            <label className="block text-sm font-medium text-gray-700 mb-2">Profile Photo</label>
+            <ImageUpload value={photo} onChange={setPhoto} folder="team" label="Upload profile photo" circular />
           </div>
 
-          {/* Settings */}
           <div className="bg-white rounded-lg border border-gray-200 p-4 space-y-3">
             <div>
               <label className="block text-sm text-gray-600">Display Order</label>
-              <input
-                {...register('display_order')}
-                type="number"
-                className="w-full px-3 py-1 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500"
-                placeholder="0"
-              />
+              <input {...register('display_order')} type="number" className="w-full px-3 py-1 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500" placeholder="0" />
             </div>
 
             <label className="flex items-center gap-2 text-sm text-gray-600">
-              <input
-                {...register('is_active')}
-                type="checkbox"
-                className="w-4 h-4 text-primary-500 focus:ring-primary-500"
-              />
+              <input {...register('is_active')} type="checkbox" className="w-4 h-4 text-primary-500 focus:ring-primary-500" />
               Active
             </label>
           </div>
 
-          {/* Submit */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-primary-500 text-white px-6 py-3 rounded-lg font-medium hover:bg-primary-600 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
-          >
+          <button type="submit" disabled={loading} className="w-full bg-primary-500 text-white px-6 py-3 rounded-lg font-medium hover:bg-primary-600 disabled:opacity-50 flex items-center justify-center gap-2">
             {loading && <FaSpinner className="animate-spin" />}
             {isEditing ? 'Update Member' : 'Add Member'}
           </button>
