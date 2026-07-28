@@ -1,4 +1,4 @@
-//app/(auth)/login/page.tsx
+//cat > app/(auth)/login/page.tsx << 'EOF
 'use client'
 
 import { useState } from 'react'
@@ -38,6 +38,7 @@ export default function LoginPage() {
       if (data.access_token) {
         localStorage.setItem('supabase_access_token', data.access_token)
         localStorage.setItem('supabase_refresh_token', data.refresh_token)
+        // ✅ CORRECT - redirect to /admin/dashboard (not /(admin)/admin/dashboard)
         window.location.href = '/admin/dashboard'
       }
     } catch (err: any) {
@@ -100,3 +101,4 @@ export default function LoginPage() {
     </div>
   )
 }
+//EOF
