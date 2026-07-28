@@ -38,7 +38,7 @@ export default function LoginPage() {
       if (data.access_token) {
         localStorage.setItem('supabase_access_token', data.access_token)
         localStorage.setItem('supabase_refresh_token', data.refresh_token)
-        window.location.href = '/(admin)/admin/dashboard'
+        window.location.href = '/admin/dashboard'
       }
     } catch (err: any) {
       setError('Connection error: ' + err.message)
