@@ -1,7 +1,7 @@
 //cat > app/\(auth\)/login/page.tsx << 'EOF'
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
 
 const supabaseUrl = 'https://wfwbkwjujlvirxjytihw.supabase.co'
@@ -13,6 +13,20 @@ export default function LoginPage() {
   const [error, setError] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [checking, setChecking] = useState(true)
+
+  // Check if already logged in
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (session) {
+        window.location.href = '/admin/dashboard'
+      } else {
+        setChecking(false)
+      }
+    }
+    checkSession()
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -32,13 +46,21 @@ export default function LoginPage() {
       }
 
       if (data?.user) {
-        // ✅ Use window.location for full page reload
+        // Force a full page reload to ensure session is recognized
         window.location.href = '/admin/dashboard'
       }
     } catch (err: any) {
       setError('Connection error: ' + err.message)
       setLoading(false)
     }
+  }
+
+  if (checking) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 via-cream-50 to-white">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
+      </div>
+    )
   }
 
   return (
