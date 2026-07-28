@@ -25,9 +25,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   useEffect(() => {
     const checkSession = async () => {
+      // ✅ Check if supabase exists before using it
+      if (!supabase) {
+        router.push('/login')
+        return
+      }
+
       const { data: { session } } = await supabase.auth.getSession()
       if (!session) {
-        // Redirect to login if no session
         router.push('/login')
         return
       }
@@ -65,7 +70,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             ))}
             <button
               onClick={async () => {
-                await supabase.auth.signOut()
+                if (supabase) {
+                  await supabase.auth.signOut()
+                }
                 router.push('/login')
               }}
               className="text-sm text-red-500 hover:text-red-600"
