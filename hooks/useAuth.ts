@@ -3,11 +3,10 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase/client'
-import { User } from '@/lib/types'
 import { useRouter } from 'next/navigation'
 
 interface AuthState {
-  user: User | null
+  user: any | null
   session: any | null
   isLoading: boolean
   isAuthenticated: boolean
@@ -23,23 +22,26 @@ export function useAuth() {
   })
 
   useEffect(() => {
-    // Get initial session
+    let isMounted = true
+
     const getSession = async () => {
+      // If supabase is not available, set loading to false
       if (!supabase) {
-        setState({
-          user: null,
-          session: null,
-          isLoading: false,
-          isAuthenticated: false,
-        })
+        if (isMounted) {
+          setState({
+            user: null,
+            session: null,
+            isLoading: false,
+            isAuthenticated: false,
+          })
+        }
         return
       }
 
       try {
         const { data: { session } } = await supabase.auth.getSession()
         
-        if (session) {
-          // Get user data from the users table
+        if (session && isMounted) {
           const { data: userData } = await supabase
             .from('users')
             .select('*')
@@ -47,12 +49,12 @@ export function useAuth() {
             .single()
 
           setState({
-            user: userData as User,
+            user: userData || null,
             session,
             isLoading: false,
             isAuthenticated: true,
           })
-        } else {
+        } else if (isMounted) {
           setState({
             user: null,
             session: null,
@@ -61,38 +63,7 @@ export function useAuth() {
           })
         }
       } catch (error) {
-        setState({
-          user: null,
-          session: null,
-          isLoading: false,
-          isAuthenticated: false,
-        })
-      }
-    }
-
-    getSession()
-
-    // Listen for auth changes
-    if (!supabase) {
-      return
-    }
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event: string, session: any) => {
-        if (event === 'SIGNED_IN' && session) {
-          const { data: userData } = await supabase
-            .from('users')
-            .select('*')
-            .eq('id', session.user.id)
-            .single()
-
-          setState({
-            user: userData as User,
-            session,
-            isLoading: false,
-            isAuthenticated: true,
-          })
-        } else if (event === 'SIGNED_OUT') {
+        if (isMounted) {
           setState({
             user: null,
             session: null,
@@ -101,10 +72,48 @@ export function useAuth() {
           })
         }
       }
-    )
+    }
+
+    getSession()
+
+    // Auth state change listener
+    if (supabase) {
+      const { data: { subscription } } = supabase.auth.onAuthStateChange(
+        async (event: string, session: any) => {
+          if (!isMounted) return
+
+          if (event === 'SIGNED_IN' && session) {
+            const { data: userData } = await supabase
+              .from('users')
+              .select('*')
+              .eq('id', session.user.id)
+              .single()
+
+            setState({
+              user: userData || null,
+              session,
+              isLoading: false,
+              isAuthenticated: true,
+            })
+          } else if (event === 'SIGNED_OUT') {
+            setState({
+              user: null,
+              session: null,
+              isLoading: false,
+              isAuthenticated: false,
+            })
+          }
+        }
+      )
+
+      return () => {
+        isMounted = false
+        subscription.unsubscribe()
+      }
+    }
 
     return () => {
-      subscription.unsubscribe()
+      isMounted = false
     }
   }, [])
 
@@ -149,18 +158,15 @@ export function useAuth() {
 
     if (error) throw error
 
-    // Create user record in the users table
     if (data.user) {
-      const { error: insertError } = await supabase
+      await supabase
         .from('users')
         .insert({
           id: data.user.id,
           email: data.user.email,
           full_name: fullName,
-          role: 'editor', // Default role
+          role: 'editor',
         })
-
-      if (insertError) throw insertError
     }
 
     return data
