@@ -25,16 +25,16 @@ export function useAuth() {
     let isMounted = true
 
     const getSession = async () => {
+      if (!isMounted) return
+      
       // If supabase is not available, set loading to false
       if (!supabase) {
-        if (isMounted) {
-          setState({
-            user: null,
-            session: null,
-            isLoading: false,
-            isAuthenticated: false,
-          })
-        }
+        setState({
+          user: null,
+          session: null,
+          isLoading: false,
+          isAuthenticated: false,
+        })
         return
       }
 
@@ -76,25 +76,31 @@ export function useAuth() {
 
     getSession()
 
-    // Auth state change listener
+    // Auth state change listener - only set up if supabase exists
+    let subscription: { unsubscribe: () => void } | null = null
+
     if (supabase) {
-      const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      const { data: { subscription: sub } } = supabase.auth.onAuthStateChange(
         async (event: string, session: any) => {
           if (!isMounted) return
 
           if (event === 'SIGNED_IN' && session) {
-            const { data: userData } = await supabase
-              .from('users')
-              .select('*')
-              .eq('id', session.user.id)
-              .single()
+            // Use a local variable to avoid the null check issue
+            const sb = supabase
+            if (sb) {
+              const { data: userData } = await sb
+                .from('users')
+                .select('*')
+                .eq('id', session.user.id)
+                .single()
 
-            setState({
-              user: userData || null,
-              session,
-              isLoading: false,
-              isAuthenticated: true,
-            })
+              setState({
+                user: userData || null,
+                session,
+                isLoading: false,
+                isAuthenticated: true,
+              })
+            }
           } else if (event === 'SIGNED_OUT') {
             setState({
               user: null,
@@ -105,15 +111,14 @@ export function useAuth() {
           }
         }
       )
-
-      return () => {
-        isMounted = false
-        subscription.unsubscribe()
-      }
+      subscription = sub
     }
 
     return () => {
       isMounted = false
+      if (subscription) {
+        subscription.unsubscribe()
+      }
     }
   }, [])
 
