@@ -1,3 +1,4 @@
+//cat > hooks/useAuth.ts << 'EOF'
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
@@ -24,6 +25,16 @@ export function useAuth() {
   useEffect(() => {
     // Get initial session
     const getSession = async () => {
+      if (!supabase) {
+        setState({
+          user: null,
+          session: null,
+          isLoading: false,
+          isAuthenticated: false,
+        })
+        return
+      }
+
       try {
         const { data: { session } } = await supabase.auth.getSession()
         
@@ -62,38 +73,44 @@ export function useAuth() {
     getSession()
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event: string, session: any) => {
-        if (event === 'SIGNED_IN' && session) {
-          const { data: userData } = await supabase
-            .from('users')
-            .select('*')
-            .eq('id', session.user.id)
-            .single()
+    if (supabase) {
+      const { data: { subscription } } = supabase.auth.onAuthStateChange(
+        async (event: string, session: any) => {
+          if (event === 'SIGNED_IN' && session) {
+            const { data: userData } = await supabase
+              .from('users')
+              .select('*')
+              .eq('id', session.user.id)
+              .single()
 
-          setState({
-            user: userData as User,
-            session,
-            isLoading: false,
-            isAuthenticated: true,
-          })
-        } else if (event === 'SIGNED_OUT') {
-          setState({
-            user: null,
-            session: null,
-            isLoading: false,
-            isAuthenticated: false,
-          })
+            setState({
+              user: userData as User,
+              session,
+              isLoading: false,
+              isAuthenticated: true,
+            })
+          } else if (event === 'SIGNED_OUT') {
+            setState({
+              user: null,
+              session: null,
+              isLoading: false,
+              isAuthenticated: false,
+            })
+          }
         }
-      }
-    )
+      )
 
-    return () => {
-      subscription.unsubscribe()
+      return () => {
+        subscription.unsubscribe()
+      }
     }
   }, [])
 
   const login = useCallback(async (email: string, password: string) => {
+    if (!supabase) {
+      throw new Error('Authentication service unavailable')
+    }
+
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -104,12 +121,20 @@ export function useAuth() {
   }, [])
 
   const logout = useCallback(async () => {
+    if (!supabase) {
+      throw new Error('Authentication service unavailable')
+    }
+
     const { error } = await supabase.auth.signOut()
     if (error) throw error
     router.push('/login')
   }, [router])
 
   const register = useCallback(async (email: string, password: string, fullName: string) => {
+    if (!supabase) {
+      throw new Error('Authentication service unavailable')
+    }
+
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -140,6 +165,10 @@ export function useAuth() {
   }, [])
 
   const resetPassword = useCallback(async (email: string) => {
+    if (!supabase) {
+      throw new Error('Authentication service unavailable')
+    }
+
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/reset-password`,
     })
@@ -155,3 +184,4 @@ export function useAuth() {
     resetPassword,
   }
 }
+//EOF
