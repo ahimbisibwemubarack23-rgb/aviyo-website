@@ -2,7 +2,6 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
 import {
   FaFileAlt,
   FaBox,
@@ -15,7 +14,6 @@ import {
 } from 'react-icons/fa'
 
 export default function DashboardPage() {
-  const router = useRouter()
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -131,4 +129,4 @@ export default function DashboardPage() {
     </div>
   )
 }
-// EOF
+//EOF
