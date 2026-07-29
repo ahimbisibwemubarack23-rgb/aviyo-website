@@ -24,14 +24,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   useEffect(() => {
     const checkSession = async () => {
+      // If supabase is not available, redirect
       if (!supabase) {
-        window.location.replace('/login')
+        window.location.href = '/login'
         return
       }
 
       const { data: { session } } = await supabase.auth.getSession()
       if (!session) {
-        window.location.replace('/login')
+        window.location.href = '/login'
         return
       }
       setLoading(false)
@@ -69,7 +70,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 if (supabase) {
                   await supabase.auth.signOut()
                 }
-                window.location.replace('/login')
+                window.location.href = '/login'
               }}
               className="text-sm text-red-500 hover:text-red-600"
             >

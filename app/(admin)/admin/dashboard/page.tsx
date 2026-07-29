@@ -1,194 +1,50 @@
-//cat > app/\(admin\)/admin/dashboard/page.tsx << 'EOF'
+// cat > app/\(admin\)/admin/dashboard/page.tsx << 'EOF'
 'use client'
-export const runtime = 'edge';
+
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase/client'
-import { useRouter } from 'next/navigation'
-import {
-  FaFileAlt,
-  FaBox,
-  FaUsers,
-  FaQuestionCircle,
-  FaStar,
-  FaEnvelope,
-  FaNewspaper,
-  FaTractor,
-} from 'react-icons/fa'
 
 export default function DashboardPage() {
-  const router = useRouter()
-  const [loading, setLoading] = useState(true)
-  const [stats, setStats] = useState({
-    blog: 0,
-    products: 0,
-    team: 0,
-    faq: 0,
-    testimonials: 0,
-    contacts: 0,
-    subscribers: 0,
-    farmers: 0,
-  })
+  const [user, setUser] = useState<any>(null)
 
   useEffect(() => {
-    const checkAuth = async () => {
-      if (!supabase) {
-        router.push('/login')
-        return
-      }
-
-      const { data: { session } } = await supabase.auth.getSession()
-      if (!session) {
-        router.push('/login')
-        return
-      }
-
-      try {
-        const [
-          { count: blogCount },
-          { count: productCount },
-          { count: teamCount },
-          { count: faqCount },
-          { count: testimonialCount },
-          { count: contactCount },
-          { count: subscriberCount },
-          { count: farmerCount },
-        ] = await Promise.all([
-          supabase.from('blog_posts').select('*', { count: 'exact', head: true }),
-          supabase.from('products').select('*', { count: 'exact', head: true }),
-          supabase.from('team_members').select('*', { count: 'exact', head: true }),
-          supabase.from('faqs').select('*', { count: 'exact', head: true }),
-          supabase.from('testimonials').select('*', { count: 'exact', head: true }),
-          supabase.from('contact_submissions').select('*', { count: 'exact', head: true }),
-          supabase.from('newsletter_subscribers').select('*', { count: 'exact', head: true }),
-          supabase.from('farmer_registrations').select('*', { count: 'exact', head: true }),
-        ])
-
-        setStats({
-          blog: blogCount || 0,
-          products: productCount || 0,
-          team: teamCount || 0,
-          faq: faqCount || 0,
-          testimonials: testimonialCount || 0,
-          contacts: contactCount || 0,
-          subscribers: subscriberCount || 0,
-          farmers: farmerCount || 0,
-        })
-      } catch (error) {
-        console.error('Error fetching stats:', error)
-      } finally {
-        setLoading(false)
-      }
+    const getUser = async () => {
+      if (!supabase) return
+      const { data: { user } } = await supabase.auth.getUser()
+      setUser(user)
     }
-
-    checkAuth()
-  }, [router])
-
-  const handleLogout = async () => {
-    if (supabase) {
-      await supabase.auth.signOut()
-    }
-    router.push('/login')
-  }
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
-      </div>
-    )
-  }
-
-  const cards = [
-    { title: 'Blog Posts', count: stats.blog, icon: FaFileAlt, href: '/admin/blog', color: 'text-blue-500', bg: 'bg-blue-50' },
-    { title: 'Products', count: stats.products, icon: FaBox, href: '/admin/products', color: 'text-green-500', bg: 'bg-green-50' },
-    { title: 'Team Members', count: stats.team, icon: FaUsers, href: '/admin/team', color: 'text-purple-500', bg: 'bg-purple-50' },
-    { title: 'FAQs', count: stats.faq, icon: FaQuestionCircle, href: '/admin/faq', color: 'text-yellow-500', bg: 'bg-yellow-50' },
-    { title: 'Testimonials', count: stats.testimonials, icon: FaStar, href: '/admin/testimonials', color: 'text-orange-500', bg: 'bg-orange-50' },
-    { title: 'Contacts', count: stats.contacts, icon: FaEnvelope, href: '/admin/contacts', color: 'text-red-500', bg: 'bg-red-50' },
-    { title: 'Newsletter', count: stats.subscribers, icon: FaNewspaper, href: '/admin/newsletter', color: 'text-indigo-500', bg: 'bg-indigo-50' },
-    { title: 'Farmers', count: stats.farmers, icon: FaTractor, href: '/admin/farmers', color: 'text-teal-500', bg: 'bg-teal-50' },
-  ]
+    getUser()
+  }, [])
 
   return (
-    <div className="p-6">
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-gray-500">Welcome back! Here's what's happening with your content.</p>
+    <div>
+      <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+      <p className="text-gray-500 mt-2">
+        Welcome, {user?.email || 'Admin'}!
+      </p>
+      <div className="mt-6 grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+          <h3 className="font-semibold text-gray-900">Products</h3>
+          <p className="text-3xl font-bold text-primary-500 mt-2">0</p>
+          <a href="/admin/products" className="text-sm text-primary-500 mt-2 block">Manage →</a>
         </div>
-        <button
-          onClick={handleLogout}
-          className="text-red-500 hover:text-red-600 text-sm font-medium"
-        >
-          Logout
-        </button>
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {cards.map((card) => (
-          <a
-            key={card.title}
-            href={card.href}
-            className="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow border border-gray-100"
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-500">{card.title}</p>
-                <p className="text-3xl font-bold text-gray-900 mt-1">{card.count}</p>
-              </div>
-              <div className={`${card.bg} p-3 rounded-xl`}>
-                <card.icon className={`w-6 h-6 ${card.color}`} />
-              </div>
-            </div>
-            <div className="mt-4 text-sm text-primary-500 font-medium">
-              Manage →
-            </div>
-          </a>
-        ))}
-      </div>
-
-      <div className="mt-12">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <a
-            href="/admin/blog/new"
-            className="bg-white rounded-xl shadow-sm p-4 hover:shadow-md transition-shadow border border-gray-100 text-center"
-          >
-            <div className="w-12 h-12 bg-primary-50 text-primary-500 rounded-xl flex items-center justify-center mx-auto mb-2">
-              <FaFileAlt className="w-6 h-6" />
-            </div>
-            <span className="text-sm font-medium text-gray-700">New Blog Post</span>
-          </a>
-          <a
-            href="/admin/products/new"
-            className="bg-white rounded-xl shadow-sm p-4 hover:shadow-md transition-shadow border border-gray-100 text-center"
-          >
-            <div className="w-12 h-12 bg-green-50 text-green-500 rounded-xl flex items-center justify-center mx-auto mb-2">
-              <FaBox className="w-6 h-6" />
-            </div>
-            <span className="text-sm font-medium text-gray-700">New Product</span>
-          </a>
-          <a
-            href="/admin/team/new"
-            className="bg-white rounded-xl shadow-sm p-4 hover:shadow-md transition-shadow border border-gray-100 text-center"
-          >
-            <div className="w-12 h-12 bg-purple-50 text-purple-500 rounded-xl flex items-center justify-center mx-auto mb-2">
-              <FaUsers className="w-6 h-6" />
-            </div>
-            <span className="text-sm font-medium text-gray-700">Add Team Member</span>
-          </a>
-          <a
-            href="/admin/faq/new"
-            className="bg-white rounded-xl shadow-sm p-4 hover:shadow-md transition-shadow border border-gray-100 text-center"
-          >
-            <div className="w-12 h-12 bg-yellow-50 text-yellow-500 rounded-xl flex items-center justify-center mx-auto mb-2">
-              <FaQuestionCircle className="w-6 h-6" />
-            </div>
-            <span className="text-sm font-medium text-gray-700">Add FAQ</span>
-          </a>
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+          <h3 className="font-semibold text-gray-900">Blog Posts</h3>
+          <p className="text-3xl font-bold text-primary-500 mt-2">0</p>
+          <a href="/admin/blog" className="text-sm text-primary-500 mt-2 block">Manage →</a>
+        </div>
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+          <h3 className="font-semibold text-gray-900">Team Members</h3>
+          <p className="text-3xl font-bold text-primary-500 mt-2">0</p>
+          <a href="/admin/team" className="text-sm text-primary-500 mt-2 block">Manage →</a>
+        </div>
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+          <h3 className="font-semibold text-gray-900">FAQs</h3>
+          <p className="text-3xl font-bold text-primary-500 mt-2">0</p>
+          <a href="/admin/faq" className="text-sm text-primary-500 mt-2 block">Manage →</a>
         </div>
       </div>
     </div>
   )
 }
-//EOF
+// EOF
