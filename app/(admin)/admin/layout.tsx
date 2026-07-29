@@ -1,4 +1,4 @@
-//cat > app/\(admin\)/admin/layout.tsx << 'EOF'
+// cat > app/\(admin\)/admin/layout.tsx << 'EOF'
 'use client'
 
 import { useEffect, useState } from 'react'
@@ -25,24 +25,21 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   useEffect(() => {
     const checkSession = async () => {
-      // ✅ Check if supabase exists before using it
       if (!supabase) {
-        router.push('/login')
+        window.location.replace('/login')
         return
       }
 
       const { data: { session } } = await supabase.auth.getSession()
       if (!session) {
-        router.push('/login')
+        window.location.replace('/login')
         return
       }
-      // If session exists, show the content
       setLoading(false)
     }
     checkSession()
-  }, [router])
+  }, [])
 
-  // Show loading indicator while checking session
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -73,7 +70,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 if (supabase) {
                   await supabase.auth.signOut()
                 }
-                router.push('/login')
+                window.location.replace('/login')
               }}
               className="text-sm text-red-500 hover:text-red-600"
             >
@@ -86,4 +83,4 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     </div>
   )
 }
-//EOF
+// EOF

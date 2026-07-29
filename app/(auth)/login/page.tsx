@@ -1,4 +1,4 @@
-//cat > app/\(auth\)/login/page.tsx << 'EOF'
+// cat > app/\(auth\)/login/page.tsx << 'EOF'
 'use client'
 
 import { useState, useEffect } from 'react'
@@ -20,7 +20,8 @@ export default function LoginPage() {
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession()
       if (session) {
-        window.location.href = '/admin/dashboard'
+        // Force redirect to dashboard
+        window.location.replace('/admin/dashboard')
       } else {
         setChecking(false)
       }
@@ -46,8 +47,8 @@ export default function LoginPage() {
       }
 
       if (data?.user) {
-        // Force a full page reload to ensure session is recognized
-        window.location.href = '/admin/dashboard'
+        // Force redirect with replace
+        window.location.replace('/admin/dashboard')
       }
     } catch (err: any) {
       setError('Connection error: ' + err.message)
@@ -117,4 +118,4 @@ export default function LoginPage() {
     </div>
   )
 }
-//EOF
+// EOF
