@@ -2,7 +2,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter, usePathname } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase/client'
 
@@ -19,7 +19,6 @@ const navigation = [
 ]
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  const router = useRouter()
   const pathname = usePathname()
   const [isAuthorized, setIsAuthorized] = useState(false)
   const [loading, setLoading] = useState(true)
