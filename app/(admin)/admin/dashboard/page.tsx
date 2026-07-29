@@ -19,14 +19,13 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Check if user is logged in
     const token = localStorage.getItem('supabase_access_token')
     if (!token) {
-      router.push('/login')
+      window.location.href = '/login'
       return
     }
     setLoading(false)
-  }, [router])
+  }, [])
 
   if (loading) {
     return (
