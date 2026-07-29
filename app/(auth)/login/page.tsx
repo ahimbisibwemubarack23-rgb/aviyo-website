@@ -31,9 +31,12 @@ export default function LoginPage() {
         return
       }
 
-      if (data?.user) {
-        // Force navigation to dashboard
-        window.location.href = '/admin/dashboard'
+      if (data?.session) {
+        // Store tokens in localStorage
+        localStorage.setItem('supabase_access_token', data.session.access_token)
+        localStorage.setItem('supabase_refresh_token', data.session.refresh_token)
+        // Use window.location.replace for a clean redirect
+        window.location.replace('/admin/dashboard')
       }
     } catch (err: any) {
       setError('Connection error: ' + err.message)
