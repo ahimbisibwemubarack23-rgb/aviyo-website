@@ -1,6 +1,5 @@
 // app/sitemap.ts
 import { supabaseAdmin } from '@/lib/supabase/server'
-
 // Use your custom domain instead of the pages.dev URL
 const BASE_URL = 'https://aviyo.online'
 
