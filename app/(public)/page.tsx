@@ -7,6 +7,17 @@ import Hero from '@/components/ui/Hero'
 import Newsletter from '@/components/ui/Newsletter'
 import Testimonials from '@/components/ui/Testimonials'
 import WhyAviyo from '@/components/ui/WhyAviyo'
+import { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Aviyo Plant-Based Nutrition - Healthy, Affordable Plant-Based Foods',
+  description: 'Enzyme-enhanced plant-based milks and SuperSoft Chapati flour for lactose-intolerant and health-conscious Ugandans.',
+  keywords: 'plant-based milk, lactose-free, enzyme-enhanced, Ugandan food, healthy nutrition',
+  verification: {
+    google: 'E2bMyFmMCKdFksA1CLWrSJWNFstAtexa8akT5jResX8',
+  },
+}
+
 
 interface Product {
   id: string
