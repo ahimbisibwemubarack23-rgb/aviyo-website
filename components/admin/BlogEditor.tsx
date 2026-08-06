@@ -73,6 +73,13 @@ export default function BlogEditor({ initialData, isEditing = false }: BlogEdito
   const onSubmit = async (data: any) => {
     setLoading(true)
     try {
+      // Check if supabase is available
+      if (!supabase) {
+        toast.error('Database connection not available. Please try again later.')
+        setLoading(false)
+        return
+      }
+
       const payload = {
         ...data,
         content,
