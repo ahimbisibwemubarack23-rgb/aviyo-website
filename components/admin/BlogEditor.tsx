@@ -1,4 +1,4 @@
-// components/admin/BlogEditor.tsx (updated)
+//cat > components/admin/BlogEditor.tsx << 'EOF'
 'use client'
 
 import { useState } from 'react'
@@ -10,7 +10,10 @@ import { FaSpinner, FaTimes } from 'react-icons/fa'
 import ImageUpload from './ImageUpload'
 import RichTextEditor from './RichTextEditor'
 
-// ... rest of imports and types ...
+interface BlogEditorProps {
+  initialData?: any
+  isEditing?: boolean
+}
 
 export default function BlogEditor({ initialData, isEditing = false }: BlogEditorProps) {
   const router = useRouter()
@@ -72,7 +75,7 @@ export default function BlogEditor({ initialData, isEditing = false }: BlogEdito
     try {
       const payload = {
         ...data,
-        content, // This comes from the rich text editor
+        content,
         featured_image: featuredImage,
         categories,
         tags,
@@ -171,7 +174,7 @@ export default function BlogEditor({ initialData, isEditing = false }: BlogEdito
           </div>
         </div>
 
-        {/* Sidebar - Same as before */}
+        {/* Sidebar */}
         <div className="space-y-6">
           {/* Featured Image */}
           <div className="bg-white rounded-lg border border-gray-200 p-4">
@@ -329,3 +332,4 @@ export default function BlogEditor({ initialData, isEditing = false }: BlogEdito
     </form>
   )
 }
+//EOF
