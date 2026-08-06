@@ -1,4 +1,3 @@
-// components/admin/RichTextEditor.tsx
 'use client'
 
 import { useEditor, EditorContent } from '@tiptap/react'
@@ -86,6 +85,12 @@ export default function RichTextEditor({
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
+
+    // Check if supabase is available
+    if (!supabase) {
+      alert('Storage service not available. Please try again later.')
+      return
+    }
 
     setUploading(true)
     try {
