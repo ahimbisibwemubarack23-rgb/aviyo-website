@@ -5,6 +5,12 @@ const BASE_URL = 'https://aviyo.online'
 
 async function getSitemapEntries() {
   try {
+    // Check if supabaseAdmin is available
+    if (!supabaseAdmin) {
+      console.warn('Supabase admin client not available during build. Returning empty sitemap.')
+      return { products: [], blogPosts: [] }
+    }
+
     const [products, blogPosts] = await Promise.all([
       supabaseAdmin
         .from('products')
@@ -102,4 +108,3 @@ export default async function sitemap() {
 
   return [...staticPages, ...productPages, ...blogPages]
 }
-// EOF
