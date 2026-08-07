@@ -21,21 +21,10 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey)
 export default function DashboardPage() {
   const [loading, setLoading] = useState(true)
   const [user, setUser] = useState<any>(null)
-  const [stats, setStats] = useState({
-    blog: 0,
-    products: 0,
-    team: 0,
-    faq: 0,
-    testimonials: 0,
-    contacts: 0,
-    subscribers: 0,
-    farmers: 0,
-  })
 
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        // Check if user is logged in via Supabase session
         const { data: { session } } = await supabase.auth.getSession()
         
         if (!session) {
@@ -65,6 +54,17 @@ export default function DashboardPage() {
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
       </div>
     )
+  }
+
+  const stats = {
+    blog: 0,
+    products: 0,
+    team: 0,
+    faq: 0,
+    testimonials: 0,
+    contacts: 0,
+    subscribers: 0,
+    farmers: 0,
   }
 
   const cards = [
