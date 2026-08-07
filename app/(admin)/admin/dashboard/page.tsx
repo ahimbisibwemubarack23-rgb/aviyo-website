@@ -29,7 +29,7 @@ export default function DashboardPage() {
           return
         }
 
-        const response = await fetch(`${SUPABASE_URL}/functions/v1/cors-handler/auth/v1/user`, {
+        const response = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'apikey': SUPABASE_ANON_KEY,

@@ -1,5 +1,0 @@
-{
-  "imports": {
-    "npm:@supabase/supabase-js@^2/cors": "https://deno.land/x/supabase@1.0.0/mod.ts"
-  }
-}
