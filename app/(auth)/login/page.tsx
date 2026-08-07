@@ -1,7 +1,6 @@
-// cat > app/\(auth\)/login/page.tsx << 'EOF'
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
 
 const supabaseUrl = 'https://wfwbkwjujlvirxjytihw.supabase.co'
@@ -10,9 +9,27 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false)
+  const [checking, setChecking] = useState(true)
   const [error, setError] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+
+  // Check if already logged in
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession()
+        if (session) {
+          window.location.href = '/admin/dashboard'
+          return
+        }
+      } catch (error) {
+        // Continue to login form
+      }
+      setChecking(false)
+    }
+    checkSession()
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -32,15 +49,24 @@ export default function LoginPage() {
       }
 
       if (data?.session) {
+        // Store tokens for backup
         localStorage.setItem('supabase_access_token', data.session.access_token)
         localStorage.setItem('supabase_refresh_token', data.session.refresh_token)
-        // Use window.location.href (not replace) for clean redirect
+        // Use window.location for clean redirect
         window.location.href = '/admin/dashboard'
       }
     } catch (err: any) {
       setError('Connection error: ' + err.message)
       setLoading(false)
     }
+  }
+
+  if (checking) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 via-cream-50 to-white">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
+      </div>
+    )
   }
 
   return (
@@ -97,4 +123,3 @@ export default function LoginPage() {
     </div>
   )
 }
-// EOF

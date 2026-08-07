@@ -1,7 +1,7 @@
-// cat > app/\(admin\)/admin/dashboard/page.tsx << 'EOF'
 'use client'
 
 import { useEffect, useState } from 'react'
+import { createClient } from '@supabase/supabase-js'
 import {
   FaFileAlt,
   FaBox,
@@ -11,29 +11,17 @@ import {
   FaEnvelope,
   FaNewspaper,
   FaTractor,
+  FaSignOutAlt,
 } from 'react-icons/fa'
+
+const supabaseUrl = 'https://wfwbkwjujlvirxjytihw.supabase.co'
+const supabaseAnonKey = 'sb_publishable_0Qel6JKxDnILOks0dyfaDg_22dTuFcf'
+const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 export default function DashboardPage() {
   const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    const token = localStorage.getItem('supabase_access_token')
-    if (!token) {
-      window.location.href = '/login'
-      return
-    }
-    setLoading(false)
-  }, [])
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
-      </div>
-    )
-  }
-
-  const stats = {
+  const [user, setUser] = useState<any>(null)
+  const [stats, setStats] = useState({
     blog: 0,
     products: 0,
     team: 0,
@@ -42,6 +30,41 @@ export default function DashboardPage() {
     contacts: 0,
     subscribers: 0,
     farmers: 0,
+  })
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        // Check if user is logged in via Supabase session
+        const { data: { session } } = await supabase.auth.getSession()
+        
+        if (!session) {
+          window.location.href = '/login'
+          return
+        }
+
+        setUser(session.user)
+        setLoading(false)
+      } catch (error) {
+        window.location.href = '/login'
+      }
+    }
+
+    checkAuth()
+  }, [])
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut()
+    localStorage.removeItem('supabase_access_token')
+    window.location.href = '/login'
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
+      </div>
+    )
   }
 
   const cards = [
@@ -57,9 +80,18 @@ export default function DashboardPage() {
 
   return (
     <div className="p-6">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-gray-500">Welcome to your admin dashboard!</p>
+      <div className="flex justify-between items-center mb-8">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+          <p className="text-gray-500">Welcome back, {user?.email || 'Admin'}!</p>
+        </div>
+        <button
+          onClick={handleLogout}
+          className="flex items-center gap-2 px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors"
+        >
+          <FaSignOutAlt className="w-4 h-4" />
+          Logout
+        </button>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -129,4 +161,3 @@ export default function DashboardPage() {
     </div>
   )
 }
-//EOF
