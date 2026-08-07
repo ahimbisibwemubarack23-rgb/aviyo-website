@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { createClient } from '@supabase/supabase-js'
 
 const supabaseUrl = 'https://wfwbkwjujlvirxjytihw.supabase.co'
@@ -9,29 +9,18 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false)
-  const [checking, setChecking] = useState(true)
   const [error, setError] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
 
-  useEffect(() => {
-    const checkSession = async () => {
-      try {
-        const { data: { session } } = await supabase.auth.getSession()
-        if (session) {
-          // Redirect to dashboard with a slight delay to ensure session is set
-          setTimeout(() => {
-            window.location.replace('/admin/dashboard')
-          }, 100)
-          return
-        }
-      } catch (error) {
-        console.error('Session check error:', error)
+  // Check if already logged in on mount
+  useState(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        window.location.href = '/admin/dashboard'
       }
-      setChecking(false)
-    }
-    checkSession()
-  }, [])
+    })
+  })
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -51,21 +40,13 @@ export default function LoginPage() {
       }
 
       if (data?.session) {
-        // Force a page reload to ensure all state is fresh
-        window.location.replace('/admin/dashboard')
+        // Simple redirect
+        window.location.href = '/admin/dashboard'
       }
     } catch (err: any) {
       setError('Connection error: ' + err.message)
       setLoading(false)
     }
-  }
-
-  if (checking) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 via-cream-50 to-white">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
-      </div>
-    )
   }
 
   return (

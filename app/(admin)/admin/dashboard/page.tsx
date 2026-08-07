@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState, useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
 import {
   FaFileAlt,
@@ -26,31 +26,23 @@ export default function DashboardPage() {
     const checkAuth = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession()
-        
         if (!session) {
-          window.location.replace('/login')
+          window.location.href = '/login'
           return
         }
-
         setUser(session.user)
-        setLoading(false)
       } catch (error) {
-        console.error('Auth check error:', error)
-        window.location.replace('/login')
+        window.location.href = '/login'
+      } finally {
+        setLoading(false)
       }
     }
-
     checkAuth()
   }, [])
 
   const handleLogout = async () => {
-    try {
-      await supabase.auth.signOut()
-      window.location.replace('/login')
-    } catch (error) {
-      console.error('Logout error:', error)
-      window.location.replace('/login')
-    }
+    await supabase.auth.signOut()
+    window.location.href = '/login'
   }
 
   if (loading) {
