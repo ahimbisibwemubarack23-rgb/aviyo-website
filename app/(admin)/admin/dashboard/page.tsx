@@ -13,27 +13,50 @@ import {
   FaSignOutAlt,
 } from 'react-icons/fa'
 
+const SUPABASE_URL = 'https://wfwbkwjujlvirxjytihw.supabase.co'
+const SUPABASE_ANON_KEY = 'sb_publishable_0Qel6JKxDnILOks0dyfaDg_22dTuFcf'
+
 export default function DashboardPage() {
   const [loading, setLoading] = useState(true)
   const [userEmail, setUserEmail] = useState('')
 
   useEffect(() => {
-    // Check if user is logged in via localStorage
-    const isLoggedIn = localStorage.getItem('isLoggedIn')
-    const email = localStorage.getItem('userEmail')
+    const checkAuth = async () => {
+      try {
+        const token = localStorage.getItem('supabase_access_token')
+        if (!token) {
+          window.location.href = '/login'
+          return
+        }
 
-    if (!isLoggedIn) {
-      window.location.href = '/login'
-      return
+        const response = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'apikey': SUPABASE_ANON_KEY,
+          },
+        })
+
+        if (!response.ok) {
+          localStorage.removeItem('supabase_access_token')
+          localStorage.removeItem('supabase_refresh_token')
+          window.location.href = '/login'
+          return
+        }
+
+        const user = await response.json()
+        setUserEmail(user.email || 'Admin')
+        setLoading(false)
+      } catch (error) {
+        window.location.href = '/login'
+      }
     }
 
-    setUserEmail(email || 'Admin')
-    setLoading(false)
+    checkAuth()
   }, [])
 
   const handleLogout = () => {
-    localStorage.removeItem('isLoggedIn')
-    localStorage.removeItem('userEmail')
+    localStorage.removeItem('supabase_access_token')
+    localStorage.removeItem('supabase_refresh_token')
     window.location.href = '/login'
   }
 

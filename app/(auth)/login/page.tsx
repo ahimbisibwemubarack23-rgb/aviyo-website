@@ -1,28 +1,79 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+
+const SUPABASE_URL = 'https://wfwbkwjujlvirxjytihw.supabase.co'
+const SUPABASE_ANON_KEY = 'sb_publishable_0Qel6JKxDnILOks0dyfaDg_22dTuFcf'
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false)
+  const [checking, setChecking] = useState(true)
   const [error, setError] = useState('')
-  const [email, setEmail] = useState('')
+  const [email, setEmail] = useState('admin@aviyo.online')
   const [password, setPassword] = useState('')
+
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const token = localStorage.getItem('supabase_access_token')
+        if (token) {
+          const response = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'apikey': SUPABASE_ANON_KEY,
+            },
+          })
+          if (response.ok) {
+            window.location.href = '/admin/dashboard'
+            return
+          }
+        }
+      } catch (error) {}
+      setChecking(false)
+    }
+    checkSession()
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError('')
 
-    // Simple test credentials - hardcoded for testing
-    if (email === 'admin@aviyo.online' && password === 'admin123') {
-      // Store a simple flag
-      localStorage.setItem('isLoggedIn', 'true')
-      localStorage.setItem('userEmail', email)
-      window.location.href = '/admin/dashboard'
-    } else {
-      setError('Invalid email or password. Use admin@aviyo.online / admin123')
+    try {
+      const response = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_ANON_KEY,
+        },
+        body: JSON.stringify({ email, password }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        setError(data.message || 'Invalid email or password')
+        setLoading(false)
+        return
+      }
+
+      if (data.access_token) {
+        localStorage.setItem('supabase_access_token', data.access_token)
+        localStorage.setItem('supabase_refresh_token', data.refresh_token)
+        window.location.href = '/admin/dashboard'
+      }
+    } catch (err: any) {
+      setError('Connection error: ' + err.message)
       setLoading(false)
     }
+  }
+
+  if (checking) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 via-cream-50 to-white">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
+      </div>
+    )
   }
 
   return (
@@ -34,7 +85,6 @@ export default function LoginPage() {
           </div>
           <h2 className="font-display text-3xl font-bold text-gray-900">Aviyo Admin</h2>
           <p className="text-gray-500 mt-2">Sign in to manage your content</p>
-          <p className="text-xs text-gray-400 mt-1">(Test: admin@aviyo.online / admin123)</p>
         </div>
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-6">
@@ -48,7 +98,6 @@ export default function LoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
                 placeholder="Enter your email"
-                defaultValue="admin@aviyo.online"
               />
             </div>
             <div>
@@ -60,7 +109,6 @@ export default function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
                 placeholder="Enter your password"
-                defaultValue="admin123"
               />
             </div>
             {error && (
