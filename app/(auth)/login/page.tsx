@@ -14,7 +14,6 @@ export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
 
-  // Check if already logged in
   useEffect(() => {
     const checkSession = async () => {
       try {
@@ -49,11 +48,8 @@ export default function LoginPage() {
       }
 
       if (data?.session) {
-        // Store tokens for backup
-        localStorage.setItem('supabase_access_token', data.session.access_token)
-        localStorage.setItem('supabase_refresh_token', data.session.refresh_token)
-        // Use window.location for clean redirect
-        window.location.href = '/admin/dashboard'
+        // Use window.location.replace to prevent back button issues
+        window.location.replace('/admin/dashboard')
       }
     } catch (err: any) {
       setError('Connection error: ' + err.message)

@@ -28,14 +28,14 @@ export default function DashboardPage() {
         const { data: { session } } = await supabase.auth.getSession()
         
         if (!session) {
-          window.location.href = '/login'
+          window.location.replace('/login')
           return
         }
 
         setUser(session.user)
         setLoading(false)
       } catch (error) {
-        window.location.href = '/login'
+        window.location.replace('/login')
       }
     }
 
@@ -44,8 +44,7 @@ export default function DashboardPage() {
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
-    localStorage.removeItem('supabase_access_token')
-    window.location.href = '/login'
+    window.location.replace('/login')
   }
 
   if (loading) {
