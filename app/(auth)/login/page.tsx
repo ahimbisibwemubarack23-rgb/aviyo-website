@@ -19,11 +19,14 @@ export default function LoginPage() {
       try {
         const { data: { session } } = await supabase.auth.getSession()
         if (session) {
-          window.location.href = '/admin/dashboard'
+          // Redirect to dashboard with a slight delay to ensure session is set
+          setTimeout(() => {
+            window.location.replace('/admin/dashboard')
+          }, 100)
           return
         }
       } catch (error) {
-        // Continue to login form
+        console.error('Session check error:', error)
       }
       setChecking(false)
     }
@@ -48,7 +51,7 @@ export default function LoginPage() {
       }
 
       if (data?.session) {
-        // Use window.location.replace to prevent back button issues
+        // Force a page reload to ensure all state is fresh
         window.location.replace('/admin/dashboard')
       }
     } catch (err: any) {

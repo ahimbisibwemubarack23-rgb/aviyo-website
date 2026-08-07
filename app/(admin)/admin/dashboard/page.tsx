@@ -35,6 +35,7 @@ export default function DashboardPage() {
         setUser(session.user)
         setLoading(false)
       } catch (error) {
+        console.error('Auth check error:', error)
         window.location.replace('/login')
       }
     }
@@ -43,8 +44,13 @@ export default function DashboardPage() {
   }, [])
 
   const handleLogout = async () => {
-    await supabase.auth.signOut()
-    window.location.replace('/login')
+    try {
+      await supabase.auth.signOut()
+      window.location.replace('/login')
+    } catch (error) {
+      console.error('Logout error:', error)
+      window.location.replace('/login')
+    }
   }
 
   if (loading) {
