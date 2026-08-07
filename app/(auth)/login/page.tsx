@@ -1,11 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { createClient } from '@supabase/supabase-js'
-
-const supabaseUrl = 'https://wfwbkwjujlvirxjytihw.supabase.co'
-const supabaseAnonKey = 'sb_publishable_0Qel6JKxDnILOks0dyfaDg_22dTuFcf'
-const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false)
@@ -13,38 +8,19 @@ export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
 
-  // Check if already logged in on mount
-  useState(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        window.location.href = '/admin/dashboard'
-      }
-    })
-  })
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError('')
 
-    try {
-      const { data, error: authError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      })
-
-      if (authError) {
-        setError(authError.message)
-        setLoading(false)
-        return
-      }
-
-      if (data?.session) {
-        // Simple redirect
-        window.location.href = '/admin/dashboard'
-      }
-    } catch (err: any) {
-      setError('Connection error: ' + err.message)
+    // Simple test credentials - hardcoded for testing
+    if (email === 'admin@aviyo.online' && password === 'admin123') {
+      // Store a simple flag
+      localStorage.setItem('isLoggedIn', 'true')
+      localStorage.setItem('userEmail', email)
+      window.location.href = '/admin/dashboard'
+    } else {
+      setError('Invalid email or password. Use admin@aviyo.online / admin123')
       setLoading(false)
     }
   }
@@ -58,6 +34,7 @@ export default function LoginPage() {
           </div>
           <h2 className="font-display text-3xl font-bold text-gray-900">Aviyo Admin</h2>
           <p className="text-gray-500 mt-2">Sign in to manage your content</p>
+          <p className="text-xs text-gray-400 mt-1">(Test: admin@aviyo.online / admin123)</p>
         </div>
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-6">
@@ -71,6 +48,7 @@ export default function LoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
                 placeholder="Enter your email"
+                defaultValue="admin@aviyo.online"
               />
             </div>
             <div>
@@ -82,6 +60,7 @@ export default function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
                 placeholder="Enter your password"
+                defaultValue="admin123"
               />
             </div>
             {error && (

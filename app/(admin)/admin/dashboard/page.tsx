@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { createClient } from '@supabase/supabase-js'
 import {
   FaFileAlt,
   FaBox,
@@ -14,34 +13,27 @@ import {
   FaSignOutAlt,
 } from 'react-icons/fa'
 
-const supabaseUrl = 'https://wfwbkwjujlvirxjytihw.supabase.co'
-const supabaseAnonKey = 'sb_publishable_0Qel6JKxDnILOks0dyfaDg_22dTuFcf'
-const supabase = createClient(supabaseUrl, supabaseAnonKey)
-
 export default function DashboardPage() {
   const [loading, setLoading] = useState(true)
-  const [user, setUser] = useState<any>(null)
+  const [userEmail, setUserEmail] = useState('')
 
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const { data: { session } } = await supabase.auth.getSession()
-        if (!session) {
-          window.location.href = '/login'
-          return
-        }
-        setUser(session.user)
-      } catch (error) {
-        window.location.href = '/login'
-      } finally {
-        setLoading(false)
-      }
+    // Check if user is logged in via localStorage
+    const isLoggedIn = localStorage.getItem('isLoggedIn')
+    const email = localStorage.getItem('userEmail')
+
+    if (!isLoggedIn) {
+      window.location.href = '/login'
+      return
     }
-    checkAuth()
+
+    setUserEmail(email || 'Admin')
+    setLoading(false)
   }, [])
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut()
+  const handleLogout = () => {
+    localStorage.removeItem('isLoggedIn')
+    localStorage.removeItem('userEmail')
     window.location.href = '/login'
   }
 
@@ -80,7 +72,7 @@ export default function DashboardPage() {
       <div className="flex justify-between items-center mb-8">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-gray-500">Welcome back, {user?.email || 'Admin'}!</p>
+          <p className="text-gray-500">Welcome back, {userEmail}!</p>
         </div>
         <button
           onClick={handleLogout}
