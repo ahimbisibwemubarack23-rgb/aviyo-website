@@ -17,7 +17,7 @@ export default function LoginPage() {
       try {
         const token = localStorage.getItem('supabase_access_token')
         if (token) {
-          const response = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+          const response = await fetch(`${SUPABASE_URL}/functions/v1/cors-handler/auth/v1/user`, {
             headers: {
               'Authorization': `Bearer ${token}`,
               'apikey': SUPABASE_ANON_KEY,
@@ -40,14 +40,18 @@ export default function LoginPage() {
     setError('')
 
     try {
-      const response = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': SUPABASE_ANON_KEY,
-        },
-        body: JSON.stringify({ email, password }),
-      })
+      // Use Edge Function as proxy to avoid CORS
+      const response = await fetch(
+        `${SUPABASE_URL}/functions/v1/cors-handler/auth/v1/token?grant_type=password`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': SUPABASE_ANON_KEY,
+          },
+          body: JSON.stringify({ email, password }),
+        }
+      )
 
       const data = await response.json()
 
