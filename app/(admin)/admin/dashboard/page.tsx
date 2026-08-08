@@ -21,31 +21,39 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey)
 export default function DashboardPage() {
   const [loading, setLoading] = useState(true)
   const [userEmail, setUserEmail] = useState('')
+  const [authChecked, setAuthChecked] = useState(false)
 
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession()
+        const { data: { session }, error } = await supabase.auth.getSession()
         
-        if (!session) {
-          window.location.href = '/login'
+        if (error || !session) {
+          console.log('No session found, redirecting to login...')
+          window.location.replace('/login')
           return
         }
 
         setUserEmail(session.user.email || 'Admin')
+        setAuthChecked(true)
         setLoading(false)
       } catch (error) {
         console.error('Auth check error:', error)
-        window.location.href = '/login'
+        window.location.replace('/login')
       }
     }
 
     checkAuth()
 
-    // Auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (!session) {
-        window.location.href = '/login'
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log('Auth state changed:', event)
+      if (event === 'SIGNED_OUT' || !session) {
+        window.location.replace('/login')
+      } else if (event === 'SIGNED_IN' && session) {
+        setUserEmail(session.user.email || 'Admin')
+        setAuthChecked(true)
+        setLoading(false)
       }
     })
 
@@ -58,7 +66,7 @@ export default function DashboardPage() {
     } catch (error) {
       console.error('Logout error:', error)
     }
-    window.location.href = '/login'
+    window.location.replace('/login')
   }
 
   if (loading) {
@@ -67,6 +75,10 @@ export default function DashboardPage() {
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
       </div>
     )
+  }
+
+  if (!authChecked) {
+    return null
   }
 
   const stats = {

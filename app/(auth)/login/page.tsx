@@ -20,9 +20,18 @@ export default function LoginPage() {
   useEffect(() => {
     const checkSession = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession()
+        const { data: { session }, error } = await supabase.auth.getSession()
+        
+        if (error) {
+          console.error('Session error:', error)
+          setChecking(false)
+          return
+        }
+        
         if (session) {
-          window.location.href = '/admin/dashboard'
+          console.log('Session found, redirecting to dashboard...')
+          // Use window.location.replace to prevent back button issues
+          window.location.replace('/admin/dashboard')
           return
         }
       } catch (error) {
@@ -40,11 +49,11 @@ export default function LoginPage() {
     setError('')
 
     try {
-      console.log('Attempting login with Supabase directly...')
+      console.log('Attempting login for:', email)
       
       const { data, error: signInError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+        email: email.trim(),
+        password: password.trim(),
       })
 
       if (signInError) {
@@ -55,15 +64,16 @@ export default function LoginPage() {
       }
 
       if (data?.session) {
-        console.log('Login successful!')
-        window.location.href = '/admin/dashboard'
+        console.log('Login successful! Redirecting...')
+        // Use replace to prevent going back to login
+        window.location.replace('/admin/dashboard')
       } else {
         setError('No session created')
+        setLoading(false)
       }
     } catch (err: any) {
       console.error('Connection error:', err)
       setError('Connection error: ' + (err.message || 'Unknown error'))
-    } finally {
       setLoading(false)
     }
   }
