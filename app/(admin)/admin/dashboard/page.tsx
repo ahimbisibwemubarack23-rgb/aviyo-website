@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { createClient } from '@supabase/supabase-js'
 import {
   FaFileAlt,
   FaBox,
@@ -14,9 +13,8 @@ import {
   FaSignOutAlt,
 } from 'react-icons/fa'
 
-const supabaseUrl = 'https://wfwbkwjujlvirxjytihw.supabase.co'
-const supabaseAnonKey = 'sb_publishable_0Qel6JKxDnILOks0dyfaDg_22dTuFcf'
-const supabase = createClient(supabaseUrl, supabaseAnonKey)
+const SUPABASE_URL = 'https://wfwbkwjujlvirxjytihw.supabase.co'
+const API_URL = `${SUPABASE_URL}/functions/v1/cors-handler`
 
 export default function DashboardPage() {
   const [loading, setLoading] = useState(true)
@@ -25,23 +23,14 @@ export default function DashboardPage() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        // Check for existing session
-        const { data: { session } } = await supabase.auth.getSession()
-        
-        if (!session) {
-          // Try localStorage fallback
-          const token = localStorage.getItem('supabase_access_token')
-          if (!token) {
-            window.location.replace('/login')
-            return
-          }
-          // Set session from localStorage
-          const userData = localStorage.getItem('supabase_user')
-          if (userData) {
-            setUser(JSON.parse(userData))
-          }
-        } else {
-          setUser(session.user)
+        const token = localStorage.getItem('supabase_access_token')
+        if (!token) {
+          window.location.replace('/login')
+          return
+        }
+        const userData = localStorage.getItem('supabase_user')
+        if (userData) {
+          setUser(JSON.parse(userData))
         }
         setLoading(false)
       } catch (error) {
@@ -53,7 +42,6 @@ export default function DashboardPage() {
   }, [])
 
   const handleLogout = async () => {
-    await supabase.auth.signOut()
     localStorage.removeItem('supabase_access_token')
     localStorage.removeItem('supabase_refresh_token')
     localStorage.removeItem('supabase_user')

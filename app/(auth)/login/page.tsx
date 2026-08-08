@@ -1,11 +1,13 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = 'https://wfwbkwjujlvirxjytihw.supabase.co'
-const supabaseAnonKey = 'sb_publishable_0Qel6JKxDnILOks0dyfaDg_22dTuFcf'
-const supabase = createClient(supabaseUrl, supabaseAnonKey)
+// Direct Supabase URL and keys
+const SUPABASE_URL = 'https://wfwbkwjujlvirxjytihw.supabase.co'
+const SUPABASE_ANON_KEY = 'sb_publishable_0Qel6JKxDnILOks0dyfaDg_22dTuFcf'
+
+// Use the Edge Function as a proxy
+const API_URL = `${SUPABASE_URL}/functions/v1/cors-handler`
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false)
@@ -17,10 +19,14 @@ export default function LoginPage() {
   // Check if already logged in
   useEffect(() => {
     const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (session) {
-        window.location.replace('/admin/dashboard')
-        return
+      try {
+        const token = localStorage.getItem('supabase_access_token')
+        if (token) {
+          window.location.replace('/admin/dashboard')
+          return
+        }
+      } catch (e) {
+        // Ignore
       }
       setChecking(false)
     }
@@ -33,23 +39,28 @@ export default function LoginPage() {
     setError('')
 
     try {
-      const { data, error: authError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+      // Use the Edge Function as a proxy
+      const response = await fetch(`${API_URL}/auth/v1/token?grant_type=password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_ANON_KEY,
+        },
+        body: JSON.stringify({ email, password }),
       })
 
-      if (authError) {
-        setError(authError.message)
+      const data = await response.json()
+
+      if (!response.ok) {
+        setError(data.message || 'Invalid email or password')
         setLoading(false)
         return
       }
 
-      if (data?.session) {
-        // Store tokens
-        localStorage.setItem('supabase_access_token', data.session.access_token)
-        localStorage.setItem('supabase_refresh_token', data.session.refresh_token)
+      if (data.access_token) {
+        localStorage.setItem('supabase_access_token', data.access_token)
+        localStorage.setItem('supabase_refresh_token', data.refresh_token)
         localStorage.setItem('supabase_user', JSON.stringify(data.user))
-        // Redirect using replace to prevent back button issues
         window.location.replace('/admin/dashboard')
       }
     } catch (err: any) {
