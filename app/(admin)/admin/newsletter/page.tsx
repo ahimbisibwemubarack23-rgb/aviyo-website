@@ -1,10 +1,9 @@
-export const dynamic = "force-dynamic";
-
 'use client'
+
+export const dynamic = "force-dynamic";
 
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase/client'
-import { Metadata } from 'next'
 
 export default function NewsletterManagementPage() {
   const [subscribers, setSubscribers] = useState<any[]>([])
