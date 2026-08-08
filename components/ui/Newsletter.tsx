@@ -1,4 +1,3 @@
-//cat > components/ui/Newsletter.tsx << 'EOF'
 'use client'
 
 import { useState } from 'react'
@@ -13,11 +12,6 @@ export default function Newsletter() {
     e.preventDefault()
     if (!email) {
       toast.error('Please enter your email address')
-      return
-    }
-
-    if (!supabase) {
-      toast.error('Newsletter service is temporarily unavailable. Please try again later.')
       return
     }
 
@@ -79,4 +73,3 @@ export default function Newsletter() {
     </section>
   )
 }
-//EOF

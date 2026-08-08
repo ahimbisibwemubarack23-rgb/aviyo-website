@@ -26,12 +26,6 @@ export default function ContactPage() {
     e.preventDefault()
     setLoading(true)
 
-    if (!supabase) {
-      toast.error('Database connection error. Please try again later.')
-      setLoading(false)
-      return
-    }
-
     try {
       const { error } = await supabase.from('contact_submissions').insert(formData)
 
@@ -70,19 +64,25 @@ export default function ContactPage() {
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
               <div className="text-2xl mb-2">📍</div>
               <h3 className="font-semibold text-gray-900">Visit Us</h3>
-              <p className="text-sm text-gray-500 mt-1">Kampala, Uganda</p>
+              <p className="text-sm text-gray-500 mt-1">
+                Kampala, Uganda
+              </p>
             </div>
 
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
               <div className="text-2xl mb-2">📞</div>
               <h3 className="font-semibold text-gray-900">Call Us</h3>
-              <p className="text-sm text-gray-500 mt-1">+256 784 592 947</p>
+              <p className="text-sm text-gray-500 mt-1">
+                +256 784 592 947
+              </p>
             </div>
 
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
               <div className="text-2xl mb-2">✉️</div>
               <h3 className="font-semibold text-gray-900">Email Us</h3>
-              <p className="text-sm text-gray-500 mt-1 break-all">ahimbisibwemubarack23@gmail.com</p>
+              <p className="text-sm text-gray-500 mt-1 break-all">
+                ahimbisibwemubarack23@gmail.com
+              </p>
             </div>
 
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
@@ -110,52 +110,60 @@ export default function ContactPage() {
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Your Name *</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Your Name *
+                  </label>
                   <input
                     type="text"
                     name="name"
                     value={formData.name}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                     placeholder="Enter your name"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Email Address *</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Email Address *
+                  </label>
                   <input
                     type="email"
                     name="email"
                     value={formData.email}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                     placeholder="Enter your email"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Subject</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Subject
+                </label>
                 <input
                   type="text"
                   name="subject"
                   value={formData.subject}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   placeholder="What is this about?"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Message *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Message *
+                </label>
                 <textarea
                   name="message"
                   value={formData.message}
                   onChange={handleChange}
                   rows={6}
                   required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   placeholder="Write your message here..."
                 />
               </div>
