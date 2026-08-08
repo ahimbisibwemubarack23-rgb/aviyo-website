@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { supabase } from '@/lib/supabase'
+import { useEffect, useState } from 'react'
+import { createClient } from '@supabase/supabase-js'
 import {
   FaFileAlt,
   FaBox,
@@ -14,53 +14,49 @@ import {
   FaSignOutAlt,
 } from 'react-icons/fa'
 
+const supabaseUrl = 'https://wfwbkwjujlvirxjytihw.supabase.co'
+const supabaseAnonKey = 'sb_publishable_0Qel6JKxDnILOks0dyfaDg_22dTuFcf'
+const supabase = createClient(supabaseUrl, supabaseAnonKey)
+
 export default function DashboardPage() {
   const [loading, setLoading] = useState(true)
-  const [userEmail, setUserEmail] = useState('')
-  const [authChecked, setAuthChecked] = useState(false)
+  const [user, setUser] = useState<any>(null)
 
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const { data: { session }, error } = await supabase.auth.getSession()
+        // Check for existing session
+        const { data: { session } } = await supabase.auth.getSession()
         
-        if (error || !session) {
-          console.log('No session found, redirecting to login...')
-          window.location.replace('/login')
-          return
+        if (!session) {
+          // Try localStorage fallback
+          const token = localStorage.getItem('supabase_access_token')
+          if (!token) {
+            window.location.replace('/login')
+            return
+          }
+          // Set session from localStorage
+          const userData = localStorage.getItem('supabase_user')
+          if (userData) {
+            setUser(JSON.parse(userData))
+          }
+        } else {
+          setUser(session.user)
         }
-
-        setUserEmail(session.user.email || 'Admin')
-        setAuthChecked(true)
         setLoading(false)
       } catch (error) {
-        console.error('Auth check error:', error)
+        console.error('Auth error:', error)
         window.location.replace('/login')
       }
     }
-
     checkAuth()
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log('Auth state changed:', event)
-      if (event === 'SIGNED_OUT' || !session) {
-        window.location.replace('/login')
-      } else if (event === 'SIGNED_IN' && session) {
-        setUserEmail(session.user.email || 'Admin')
-        setAuthChecked(true)
-        setLoading(false)
-      }
-    })
-
-    return () => subscription.unsubscribe()
   }, [])
 
   const handleLogout = async () => {
-    try {
-      await supabase.auth.signOut()
-    } catch (error) {
-      console.error('Logout error:', error)
-    }
+    await supabase.auth.signOut()
+    localStorage.removeItem('supabase_access_token')
+    localStorage.removeItem('supabase_refresh_token')
+    localStorage.removeItem('supabase_user')
     window.location.replace('/login')
   }
 
@@ -70,10 +66,6 @@ export default function DashboardPage() {
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
       </div>
     )
-  }
-
-  if (!authChecked) {
-    return null
   }
 
   const stats = {
@@ -100,14 +92,16 @@ export default function DashboardPage() {
 
   return (
     <div className="p-6">
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-gray-500">Welcome back, {userEmail}!</p>
+          <p className="text-gray-500">
+            Welcome, {user?.email || 'Admin'}!
+          </p>
         </div>
         <button
           onClick={handleLogout}
-          className="flex items-center gap-2 px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors"
+          className="flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
         >
           <FaSignOutAlt className="w-4 h-4" />
           Logout
