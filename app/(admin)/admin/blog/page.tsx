@@ -15,9 +15,10 @@ export default function BlogManagementPage() {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
+        // Don't join with users table to avoid RLS recursion
         const { data, error } = await supabase
           .from('blog_posts')
-          .select('*, users!author_id(full_name)')
+          .select('*')
           .order('created_at', { ascending: false })
 
         if (error) throw error
@@ -90,9 +91,6 @@ export default function BlogManagementPage() {
                     Status
                   </th>
                   <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Author
-                  </th>
-                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Date
                   </th>
                   <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -115,9 +113,6 @@ export default function BlogManagementPage() {
                       <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(post.status)}`}>
                         {post.status}
                       </span>
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-500">
-                      {post.users?.full_name || 'Unknown'}
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-500">
                       {new Date(post.created_at).toLocaleDateString()}

@@ -1,10 +1,12 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { createClient } from '@supabase/supabase-js'
 
-// Direct Supabase URL and keys
-const SUPABASE_URL = 'https://wfwbkwjujlvirxjytihw.supabase.co'
-const SUPABASE_ANON_KEY = 'sb_publishable_0Qel6JKxDnILOks0dyfaDg_22dTuFcf'
+// Use the same Supabase client everywhere
+const supabaseUrl = 'https://wfwbkwjujlvirxjytihw.supabase.co'
+const supabaseAnonKey = 'sb_publishable_0Qel6JKxDnILOks0dyfaDg_22dTuFcf'
+const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false)
@@ -13,17 +15,16 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [checking, setChecking] = useState(true)
 
-  // Check if already logged in
   useEffect(() => {
     const checkSession = async () => {
       try {
-        const token = localStorage.getItem('supabase_access_token')
-        if (token) {
+        const { data: { session } } = await supabase.auth.getSession()
+        if (session) {
           window.location.replace('/admin/dashboard')
           return
         }
       } catch (e) {
-        // Ignore
+        console.error('Session check error:', e)
       }
       setChecking(false)
     }
@@ -36,42 +37,19 @@ export default function LoginPage() {
     setError('')
 
     try {
-      // Direct fetch to Supabase Auth
-      const response = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': SUPABASE_ANON_KEY,
-        },
-        body: JSON.stringify({ email, password }),
+      const { data, error: authError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
       })
 
-      // Check if response is OK before parsing JSON
-      if (!response.ok) {
-        const text = await response.text()
-        let errorMessage = 'Invalid email or password'
-        try {
-          const data = JSON.parse(text)
-          errorMessage = data.message || errorMessage
-        } catch (e) {
-          // If response is not JSON, use status text
-          errorMessage = response.statusText || errorMessage
-        }
-        setError(errorMessage)
+      if (authError) {
+        setError(authError.message)
         setLoading(false)
         return
       }
 
-      const data = await response.json()
-
-      if (data.access_token) {
-        localStorage.setItem('supabase_access_token', data.access_token)
-        localStorage.setItem('supabase_refresh_token', data.refresh_token)
-        localStorage.setItem('supabase_user', JSON.stringify(data.user))
+      if (data?.session) {
         window.location.replace('/admin/dashboard')
-      } else {
-        setError('Login failed. Please try again.')
-        setLoading(false)
       }
     } catch (err: any) {
       console.error('Login error:', err)

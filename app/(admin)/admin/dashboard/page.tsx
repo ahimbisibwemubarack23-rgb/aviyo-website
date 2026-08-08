@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState, useEffect } from 'react'
+import { createClient } from '@supabase/supabase-js'
 import {
   FaFileAlt,
   FaBox,
@@ -13,6 +14,10 @@ import {
   FaSignOutAlt,
 } from 'react-icons/fa'
 
+const supabaseUrl = 'https://wfwbkwjujlvirxjytihw.supabase.co'
+const supabaseAnonKey = 'sb_publishable_0Qel6JKxDnILOks0dyfaDg_22dTuFcf'
+const supabase = createClient(supabaseUrl, supabaseAnonKey)
+
 export default function DashboardPage() {
   const [loading, setLoading] = useState(true)
   const [user, setUser] = useState<any>(null)
@@ -20,15 +25,12 @@ export default function DashboardPage() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const token = localStorage.getItem('supabase_access_token')
-        if (!token) {
+        const { data: { session } } = await supabase.auth.getSession()
+        if (!session) {
           window.location.replace('/login')
           return
         }
-        const userData = localStorage.getItem('supabase_user')
-        if (userData) {
-          setUser(JSON.parse(userData))
-        }
+        setUser(session.user)
         setLoading(false)
       } catch (error) {
         console.error('Auth error:', error)
@@ -39,9 +41,7 @@ export default function DashboardPage() {
   }, [])
 
   const handleLogout = async () => {
-    localStorage.removeItem('supabase_access_token')
-    localStorage.removeItem('supabase_refresh_token')
-    localStorage.removeItem('supabase_user')
+    await supabase.auth.signOut()
     window.location.replace('/login')
   }
 
