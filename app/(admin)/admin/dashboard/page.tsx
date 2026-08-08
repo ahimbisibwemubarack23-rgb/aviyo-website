@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { createClient } from '@supabase/supabase-js'
+import { supabase } from '@/lib/supabase'
 import {
   FaFileAlt,
   FaBox,
@@ -13,10 +13,6 @@ import {
   FaTractor,
   FaSignOutAlt,
 } from 'react-icons/fa'
-
-const supabaseUrl = 'https://wfwbkwjujlvirxjytihw.supabase.co'
-const supabaseAnonKey = 'sb_publishable_0Qel6JKxDnILOks0dyfaDg_22dTuFcf'
-const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 export default function DashboardPage() {
   const [loading, setLoading] = useState(true)
@@ -45,7 +41,6 @@ export default function DashboardPage() {
 
     checkAuth()
 
-    // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       console.log('Auth state changed:', event)
       if (event === 'SIGNED_OUT' || !session) {

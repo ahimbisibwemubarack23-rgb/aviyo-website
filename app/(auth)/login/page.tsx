@@ -1,14 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { createClient } from '@supabase/supabase-js'
-
-// Supabase configuration
-const supabaseUrl = 'https://wfwbkwjujlvirxjytihw.supabase.co'
-const supabaseAnonKey = 'sb_publishable_0Qel6JKxDnILOks0dyfaDg_22dTuFcf'
-
-// Create Supabase client
-const supabase = createClient(supabaseUrl, supabaseAnonKey)
+import { supabase } from '@/lib/supabase'
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false)
@@ -30,7 +23,6 @@ export default function LoginPage() {
         
         if (session) {
           console.log('Session found, redirecting to dashboard...')
-          // Use window.location.replace to prevent back button issues
           window.location.replace('/admin/dashboard')
           return
         }
@@ -65,7 +57,6 @@ export default function LoginPage() {
 
       if (data?.session) {
         console.log('Login successful! Redirecting...')
-        // Use replace to prevent going back to login
         window.location.replace('/admin/dashboard')
       } else {
         setError('No session created')
