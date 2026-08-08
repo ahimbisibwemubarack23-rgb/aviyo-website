@@ -13,9 +13,6 @@ import {
   FaSignOutAlt,
 } from 'react-icons/fa'
 
-const SUPABASE_URL = 'https://wfwbkwjujlvirxjytihw.supabase.co'
-const API_URL = `${SUPABASE_URL}/functions/v1/cors-handler`
-
 export default function DashboardPage() {
   const [loading, setLoading] = useState(true)
   const [user, setUser] = useState<any>(null)
