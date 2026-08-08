@@ -13,7 +13,7 @@ import {
   FaSignOutAlt,
 } from 'react-icons/fa'
 
-const SUPABASE_URL = 'https://wfwbkwjujlvirxjytihw.supabase.co'
+const EDGE_FUNCTION_URL = 'https://wfwbkwjujlvirxjytihw.supabase.co/functions/v1/cors-handler'
 const SUPABASE_ANON_KEY = 'sb_publishable_0Qel6JKxDnILOks0dyfaDg_22dTuFcf'
 
 export default function DashboardPage() {
@@ -29,7 +29,7 @@ export default function DashboardPage() {
           return
         }
 
-        const response = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+        const response = await fetch(`${EDGE_FUNCTION_URL}/auth/v1/user`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'apikey': SUPABASE_ANON_KEY,
