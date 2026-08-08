@@ -1,12 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { createClient } from '@supabase/supabase-js'
-
-// Use the same Supabase client everywhere
-const supabaseUrl = 'https://wfwbkwjujlvirxjytihw.supabase.co'
-const supabaseAnonKey = 'sb_publishable_0Qel6JKxDnILOks0dyfaDg_22dTuFcf'
-const supabase = createClient(supabaseUrl, supabaseAnonKey)
+import { supabase } from '@/lib/supabase/client'
+import { FaSpinner } from 'react-icons/fa'
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false)
@@ -20,13 +16,15 @@ export default function LoginPage() {
       try {
         const { data: { session } } = await supabase.auth.getSession()
         if (session) {
-          window.location.replace('/admin/dashboard')
+          // Redirect to dashboard if already logged in
+          window.location.href = '/admin/dashboard'
           return
         }
-      } catch (e) {
-        console.error('Session check error:', e)
+        setChecking(false)
+      } catch (err) {
+        console.error('Session check error:', err)
+        setChecking(false)
       }
-      setChecking(false)
     }
     checkSession()
   }, [])
@@ -43,17 +41,20 @@ export default function LoginPage() {
       })
 
       if (authError) {
-        setError(authError.message)
+        setError(authError.message || 'Invalid email or password')
         setLoading(false)
         return
       }
 
       if (data?.session) {
-        window.location.replace('/admin/dashboard')
+        // Force a hard redirect to dashboard
+        window.location.href = '/admin/dashboard'
+      } else {
+        setError('Login failed. Please try again.')
+        setLoading(false)
       }
     } catch (err: any) {
-      console.error('Login error:', err)
-      setError('Connection error: ' + err.message)
+      setError('Connection error: ' + (err.message || 'Please try again'))
       setLoading(false)
     }
   }
@@ -80,24 +81,30 @@ export default function LoginPage() {
         <form onSubmit={handleSubmit} className="mt-8 space-y-6">
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700">Email address</label>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                Email address
+              </label>
               <input
+                id="email"
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 placeholder="Enter your email"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">Password</label>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                Password
+              </label>
               <input
+                id="password"
                 type="password"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 placeholder="Enter your password"
               />
             </div>
@@ -111,9 +118,10 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-primary-500 text-white px-6 py-3 rounded-lg font-medium hover:bg-primary-600 disabled:opacity-50"
+            className="w-full bg-primary-500 text-white px-6 py-3 rounded-lg font-medium hover:bg-primary-600 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
           >
-            {loading ? 'Signing in...' : 'Sign In'}
+            {loading && <FaSpinner className="animate-spin" />}
+            Sign In
           </button>
         </form>
       </div>
