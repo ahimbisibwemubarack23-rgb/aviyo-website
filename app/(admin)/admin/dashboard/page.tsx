@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { createClient } from '@supabase/supabase-js'
 import {
   FaFileAlt,
   FaBox,
@@ -13,8 +14,9 @@ import {
   FaSignOutAlt,
 } from 'react-icons/fa'
 
-const EDGE_FUNCTION_URL = 'https://wfwbkwjujlvirxjytihw.supabase.co/functions/v1/cors-handler'
-const SUPABASE_ANON_KEY = 'sb_publishable_0Qel6JKxDnILOks0dyfaDg_22dTuFcf'
+const supabaseUrl = 'https://wfwbkwjujlvirxjytihw.supabase.co'
+const supabaseAnonKey = 'sb_publishable_0Qel6JKxDnILOks0dyfaDg_22dTuFcf'
+const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 export default function DashboardPage() {
   const [loading, setLoading] = useState(true)
@@ -23,40 +25,39 @@ export default function DashboardPage() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const token = localStorage.getItem('supabase_access_token')
-        if (!token) {
+        const { data: { session } } = await supabase.auth.getSession()
+        
+        if (!session) {
           window.location.href = '/login'
           return
         }
 
-        const response = await fetch(`${EDGE_FUNCTION_URL}/auth/v1/user`, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'apikey': SUPABASE_ANON_KEY,
-          },
-        })
-
-        if (!response.ok) {
-          localStorage.removeItem('supabase_access_token')
-          localStorage.removeItem('supabase_refresh_token')
-          window.location.href = '/login'
-          return
-        }
-
-        const user = await response.json()
-        setUserEmail(user.email || 'Admin')
+        setUserEmail(session.user.email || 'Admin')
         setLoading(false)
       } catch (error) {
+        console.error('Auth check error:', error)
         window.location.href = '/login'
       }
     }
 
     checkAuth()
+
+    // Auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!session) {
+        window.location.href = '/login'
+      }
+    })
+
+    return () => subscription.unsubscribe()
   }, [])
 
-  const handleLogout = () => {
-    localStorage.removeItem('supabase_access_token')
-    localStorage.removeItem('supabase_refresh_token')
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut()
+    } catch (error) {
+      console.error('Logout error:', error)
+    }
     window.location.href = '/login'
   }
 

@@ -1,9 +1,14 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { createClient } from '@supabase/supabase-js'
 
-const EDGE_FUNCTION_URL = 'https://wfwbkwjujlvirxjytihw.supabase.co/functions/v1/cors-handler'
-const SUPABASE_ANON_KEY = 'sb_publishable_0Qel6JKxDnILOks0dyfaDg_22dTuFcf'
+// Supabase configuration
+const supabaseUrl = 'https://wfwbkwjujlvirxjytihw.supabase.co'
+const supabaseAnonKey = 'sb_publishable_0Qel6JKxDnILOks0dyfaDg_22dTuFcf'
+
+// Create Supabase client
+const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false)
@@ -15,21 +20,16 @@ export default function LoginPage() {
   useEffect(() => {
     const checkSession = async () => {
       try {
-        const token = localStorage.getItem('supabase_access_token')
-        if (token) {
-          const response = await fetch(`${EDGE_FUNCTION_URL}/auth/v1/user`, {
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'apikey': SUPABASE_ANON_KEY,
-            },
-          })
-          if (response.ok) {
-            window.location.href = '/admin/dashboard'
-            return
-          }
+        const { data: { session } } = await supabase.auth.getSession()
+        if (session) {
+          window.location.href = '/admin/dashboard'
+          return
         }
-      } catch (error) {}
-      setChecking(false)
+      } catch (error) {
+        console.error('Session check error:', error)
+      } finally {
+        setChecking(false)
+      }
     }
     checkSession()
   }, [])
@@ -40,30 +40,30 @@ export default function LoginPage() {
     setError('')
 
     try {
-      const response = await fetch(`${EDGE_FUNCTION_URL}/auth/v1/token?grant_type=password`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': SUPABASE_ANON_KEY,
-        },
-        body: JSON.stringify({ email, password }),
+      console.log('Attempting login with Supabase directly...')
+      
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
       })
 
-      const data = await response.json()
-
-      if (!response.ok) {
-        setError(data.message || 'Invalid email or password')
+      if (signInError) {
+        console.error('Login error:', signInError)
+        setError(signInError.message || 'Invalid email or password')
         setLoading(false)
         return
       }
 
-      if (data.access_token) {
-        localStorage.setItem('supabase_access_token', data.access_token)
-        localStorage.setItem('supabase_refresh_token', data.refresh_token)
+      if (data?.session) {
+        console.log('Login successful!')
         window.location.href = '/admin/dashboard'
+      } else {
+        setError('No session created')
       }
     } catch (err: any) {
-      setError('Connection error: ' + err.message)
+      console.error('Connection error:', err)
+      setError('Connection error: ' + (err.message || 'Unknown error'))
+    } finally {
       setLoading(false)
     }
   }
@@ -90,24 +90,30 @@ export default function LoginPage() {
         <form onSubmit={handleSubmit} className="mt-8 space-y-6">
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700">Email address</label>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                Email address
+              </label>
               <input
+                id="email"
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 placeholder="Enter your email"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">Password</label>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                Password
+              </label>
               <input
+                id="password"
                 type="password"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 placeholder="Enter your password"
               />
             </div>
@@ -121,9 +127,19 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-primary-500 text-white px-6 py-3 rounded-lg font-medium hover:bg-primary-600 disabled:opacity-50"
+            className="w-full bg-primary-500 text-white px-6 py-3 rounded-lg font-medium hover:bg-primary-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? 'Signing in...' : 'Sign In'}
+            {loading ? (
+              <span className="flex items-center justify-center">
+                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Signing in...
+              </span>
+            ) : (
+              'Sign In'
+            )}
           </button>
         </form>
       </div>
