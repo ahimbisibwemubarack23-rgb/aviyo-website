@@ -1,48 +1,36 @@
-export const runtime = "edge";
 export const dynamic = "force-dynamic";
 
-import { supabaseAdmin } from '@/lib/supabase/server'
+'use client'
+
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { supabase } from '@/lib/supabase/client'
 import { FaPlus, FaEdit, FaTrash, FaEye } from 'react-icons/fa'
 
-interface BlogPost {
-  id: string
-  title: string
-  slug: string
-  excerpt: string | null
-  status: string
-  created_at: string
-  users?: {
-    full_name: string
-  }
-}
+export default function BlogManagementPage() {
+  const [posts, setPosts] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
 
-async function getBlogPosts(): Promise<BlogPost[]> {
-  const supabase = supabaseAdmin
-  if (!supabase) {
-    return []
-  }
-  
-  try {
-    const { data, error } = await supabase
-      .from('blog_posts')
-      .select('*, users!author_id(full_name)')
-      .order('created_at', { ascending: false })
-    
-    if (error) {
-      console.error('Error fetching blog posts:', error)
-      return []
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('blog_posts')
+          .select('*, users!author_id(full_name)')
+          .order('created_at', { ascending: false })
+
+        if (error) throw error
+        setPosts(data || [])
+      } catch (err: any) {
+        console.error('Error fetching posts:', err)
+        setError(err.message)
+      } finally {
+        setLoading(false)
+      }
     }
-    
-    return data || []
-  } catch (error) {
-    console.error('Error fetching blog posts:', error)
-    return []
-  }
-}
-
-export default async function BlogManagementPage() {
-  const posts = await getBlogPosts()
+    fetchPosts()
+  }, [])
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -51,6 +39,22 @@ export default async function BlogManagementPage() {
       case 'archived': return 'bg-gray-100 text-gray-700'
       default: return 'bg-gray-100 text-gray-700'
     }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+        Error loading posts: {error}
+      </div>
+    )
   }
 
   return (

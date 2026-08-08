@@ -1,55 +1,53 @@
-export const runtime = "edge";
 export const dynamic = "force-dynamic";
 
-import { supabaseAdmin } from '@/lib/supabase/server'
+'use client'
+
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { supabase } from '@/lib/supabase/client'
 import { FaPlus, FaEdit, FaTrash, FaArrowUp, FaArrowDown } from 'react-icons/fa'
 
-interface SocialLinks {
-  twitter?: string
-  linkedin?: string
-  instagram?: string
-}
+export default function TeamManagementPage() {
+  const [members, setMembers] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
 
-interface TeamMember {
-  id: string
-  name: string
-  role: string
-  bio: string | null
-  photo: string | null
-  social_links: SocialLinks | null
-  display_order: number
-  is_active: boolean
-  created_at: string
-}
+  useEffect(() => {
+    const fetchMembers = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('team_members')
+          .select('*')
+          .order('display_order', { ascending: true })
 
-async function getTeamMembers(): Promise<TeamMember[]> {
-  const supabase = supabaseAdmin
-  if (!supabase) {
-    return []
-  }
-  
-  try {
-    const { data, error } = await supabase
-      .from('team_members')
-      .select('*')
-      .order('display_order', { ascending: true })
-    
-    if (error) {
-      console.error('Error fetching team members:', error)
-      return []
+        if (error) throw error
+        setMembers(data || [])
+      } catch (err: any) {
+        console.error('Error fetching team members:', err)
+        setError(err.message)
+      } finally {
+        setLoading(false)
+      }
     }
-    
-    return data || []
-  } catch (error) {
-    console.error('Error fetching team members:', error)
-    return []
-  }
-}
+    fetchMembers()
+  }, [])
 
-export default async function TeamManagementPage() {
-  const members = await getTeamMembers()
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+        Error loading team members: {error}
+      </div>
+    )
+  }
 
   return (
     <div>

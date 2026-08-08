@@ -1,45 +1,52 @@
-export const runtime = "edge";
 export const dynamic = "force-dynamic";
 
-import { supabaseAdmin } from '@/lib/supabase/server'
+'use client'
+
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { supabase } from '@/lib/supabase/client'
 import { FaPlus, FaEdit, FaTrash, FaArrowUp, FaArrowDown } from 'react-icons/fa'
 
-interface FAQ {
-  id: string
-  question: string
-  answer: string
-  category: string | null
-  display_order: number
-  is_active: boolean
-}
+export default function FAQManagementPage() {
+  const [faqs, setFaqs] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
 
-async function getFAQs(): Promise<FAQ[]> {
-  const supabase = supabaseAdmin
-  if (!supabase) {
-    return []
-  }
-  
-  try {
-    const { data, error } = await supabase
-      .from('faqs')
-      .select('*')
-      .order('display_order', { ascending: true })
-    
-    if (error) {
-      console.error('Error fetching FAQs:', error)
-      return []
+  useEffect(() => {
+    const fetchFaqs = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('faqs')
+          .select('*')
+          .order('display_order', { ascending: true })
+
+        if (error) throw error
+        setFaqs(data || [])
+      } catch (err: any) {
+        console.error('Error fetching FAQs:', err)
+        setError(err.message)
+      } finally {
+        setLoading(false)
+      }
     }
-    
-    return data || []
-  } catch (error) {
-    console.error('Error fetching FAQs:', error)
-    return []
-  }
-}
+    fetchFaqs()
+  }, [])
 
-export default async function FAQManagementPage() {
-  const faqs = await getFAQs()
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+        Error loading FAQs: {error}
+      </div>
+    )
+  }
 
   return (
     <div>

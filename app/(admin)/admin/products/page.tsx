@@ -1,49 +1,37 @@
-export const runtime = "edge";
 export const dynamic = "force-dynamic";
 
-import { supabaseAdmin } from '@/lib/supabase/server'
+'use client'
+
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { supabase } from '@/lib/supabase/client'
 import { FaPlus, FaEdit, FaTrash, FaEye, FaBox } from 'react-icons/fa'
 
-interface Product {
-  id: string
-  name: string
-  slug: string
-  short_description: string | null
-  category: string | null
-  price: number | null
-  status: string
-  images: string[] | null
-  created_at: string
-}
+export default function ProductsManagementPage() {
+  const [products, setProducts] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
 
-async function getProducts(): Promise<Product[]> {
-  const supabase = supabaseAdmin
-  if (!supabase) {
-    return []
-  }
-  
-  try {
-    const { data, error } = await supabase
-      .from('products')
-      .select('*')
-      .order('created_at', { ascending: false })
-    
-    if (error) {
-      console.error('Error fetching products:', error)
-      return []
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('products')
+          .select('*')
+          .order('created_at', { ascending: false })
+
+        if (error) throw error
+        setProducts(data || [])
+      } catch (err: any) {
+        console.error('Error fetching products:', err)
+        setError(err.message)
+      } finally {
+        setLoading(false)
+      }
     }
-    
-    return data || []
-  } catch (error) {
-    console.error('Error fetching products:', error)
-    return []
-  }
-}
-
-export default async function ProductsManagementPage() {
-  const products = await getProducts()
+    fetchProducts()
+  }, [])
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -52,6 +40,22 @@ export default async function ProductsManagementPage() {
       case 'archived': return 'bg-gray-100 text-gray-700'
       default: return 'bg-gray-100 text-gray-700'
     }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+        Error loading products: {error}
+      </div>
+    )
   }
 
   return (

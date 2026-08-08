@@ -1,46 +1,53 @@
-export const runtime = "edge";
 export const dynamic = "force-dynamic";
 
-import { supabaseAdmin } from '@/lib/supabase/server'
+'use client'
+
+import { useState, useEffect } from 'react'
+import { supabase } from '@/lib/supabase/client'
 import { Metadata } from 'next'
 
-export const metadata: Metadata = {
-  title: 'Newsletter | Aviyo Admin',
-}
+export default function NewsletterManagementPage() {
+  const [subscribers, setSubscribers] = useState<any[]>([])
+  const [count, setCount] = useState(0)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
 
-interface Subscriber {
-  id: string
-  email: string
-  is_active: boolean
-  created_at: string
-}
+  useEffect(() => {
+    const fetchSubscribers = async () => {
+      try {
+        const { data, error, count } = await supabase
+          .from('newsletter_subscribers')
+          .select('*', { count: 'exact' })
+          .order('created_at', { ascending: false })
 
-async function getSubscribers(): Promise<{ subscribers: Subscriber[], count: number }> {
-  const supabase = supabaseAdmin
-  if (!supabase) {
-    return { subscribers: [], count: 0 }
-  }
-  
-  try {
-    const { data, error, count } = await supabase
-      .from('newsletter_subscribers')
-      .select('*', { count: 'exact' })
-      .order('created_at', { ascending: false })
-    
-    if (error) {
-      console.error('Error fetching subscribers:', error)
-      return { subscribers: [], count: 0 }
+        if (error) throw error
+        setSubscribers(data || [])
+        setCount(count || 0)
+      } catch (err: any) {
+        console.error('Error fetching subscribers:', err)
+        setError(err.message)
+      } finally {
+        setLoading(false)
+      }
     }
-    
-    return { subscribers: data || [], count: count || 0 }
-  } catch (error) {
-    console.error('Error fetching subscribers:', error)
-    return { subscribers: [], count: 0 }
-  }
-}
+    fetchSubscribers()
+  }, [])
 
-export default async function NewsletterManagementPage() {
-  const { subscribers, count } = await getSubscribers()
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+        Error loading subscribers: {error}
+      </div>
+    )
+  }
 
   return (
     <div>
