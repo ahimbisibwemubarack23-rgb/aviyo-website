@@ -1,21 +1,7 @@
-// lib/supabase/client.ts
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = 'https://wfwbkwjujlvirxjytihw.supabase.co'
-const supabaseAnonKey = 'sb_publishable_0Qel6JKxDnILOks0dyfaDg_22dTuFcf'
+// Use the correct Supabase project
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://wfwbkwjujlvirxjytihw.supabase.co'
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'sb_publishable_0Qel6JKxDnILOks0dyfaDg_22dTuFcf'
 
-// Use the Edge Function as a proxy for all requests
-const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: true,
-  },
-  global: {
-    headers: {
-      'x-use-edge-proxy': 'true',
-    },
-  },
-})
-
-export { supabase }
+export const supabase = createClient(supabaseUrl, supabaseAnonKey)
